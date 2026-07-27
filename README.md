@@ -1,253 +1,269 @@
-# ⚔️ Turn Game
+# ⚔️ Turn-Based Battle Game
 
-> Jogo de batalha por turnos desenvolvido em C++ com foco na aplicação de Programação Orientada a Objetos.
-
----
-
-# 📖 Visão Geral
-
-O projeto implementa um sistema de combate em turno utilizando conceitos de Programação Orientada a Objetos, separando responsabilidades entre classes para facilitar manutenção, expansão e reutilização do código.
+> A turn-based battle game developed in **C++**, focused on applying Object-Oriented Programming concepts and clean software design.
 
 ---
 
-# ✨ Funcionalidades
+# 📖 Overview
 
-- Sistema de batalha por turnos.
-- Sistema de ataque utilizando habilidades.
-- Sistema de defesa.
-- Sistema de mana.
-- Validação de mana antes da execução de habilidades.
-- Barras visuais de HP.
-- Barras visuais de MP.
-- Exibição do estado da batalha a cada turno.
-- Determinação automática do vencedor.
+This project implements a turn-based combat system using Object-Oriented Programming principles. Each class has a single responsibility, making the code modular, maintainable, and easy to extend.
+
+The project was created as a study of OOP concepts such as encapsulation, composition, association, const correctness, and object interaction.
 
 ---
 
-# 🔄 Fluxo Geral da Batalha
+# ✨ Features
+
+- Turn-based battle system
+- Skill-based attacks
+- Defense mechanic
+- Mana management
+- Mana validation before skill execution
+- Visual HP bars
+- Visual MP bars
+- Battle status displayed every turn
+- Automatic winner detection
+
+---
+
+# 🔄 Battle Flow
 
 ```mermaid
 flowchart TD
 
-A[Início da batalha]
+A[Battle Starts]
 
-A --> B[Turno do jogador]
+A --> B[Player Turn]
 
-B --> C[Exibe status]
+B --> C[Display Battle Status]
 
-C --> D[Escolhe ação]
+C --> D[Choose Action]
 
-D --> E{Atacar?}
+D --> E{Attack?}
 
-E -- Sim --> F[Escolher habilidade]
+E -- Yes --> F[Choose Skill]
 
-F --> G{Mana suficiente?}
+F --> G{Enough Mana?}
 
-G -- Não --> F
+G -- No --> F
 
-G -- Sim --> H[Executa ataque]
+G -- Yes --> H[Execute Attack]
 
-H --> I[Atualiza HP]
+H --> I[Update HP]
 
-E -- Defender --> J[Ativa defesa]
+E -- No --> J[Activate Defense]
 
-I --> K{Oponente vivo?}
+I --> K{Opponent Alive?}
 
 J --> K
 
-K -- Sim --> L[Turno do adversário]
+K -- Yes --> L[Opponent Turn]
 
 L --> C
 
-K -- Não --> M[Fim da batalha]
+K -- No --> M[Battle Ends]
 ```
 
 ---
 
-# 🏛️ Arquitetura
+# 🏛️ Architecture
 
-O projeto é dividido em três classes principais, cada uma responsável por uma parte específica do sistema.
+The project is divided into three main classes, each responsible for a specific part of the battle system.
 
 ```mermaid
 classDiagram
 
-class Batalha{
-+iniciar()
-+turno()
+class Battle{
++start()
++turn()
 +menu()
-+mostrarStatus()
++displayStatus()
++drawBar()
 }
 
-class Personagem{
-+atacar()
-+defender()
-+receberDano()
-+usoMana()
-+receberCura()
+class Character{
++attack()
++defend()
++takeDamage()
++useMana()
++heal()
 }
 
-class Habilidade{
-+nome
-+valorAtaque
-+custoMana
+class Skill{
++name
++attackValue
++manaCost
 }
 
-Batalha --> Personagem : controla
-Personagem --> Habilidade : utiliza
+Battle --> Character : controls
+Character --> Skill : uses
 ```
 
 ---
 
-# 🔁 Sequência de um Ataque
+# 🔁 Attack Sequence
 
 ```mermaid
 sequenceDiagram
 
-participant Jogador
-participant Batalha
-participant Personagem
-participant Habilidade
+participant Player
+participant Battle
+participant Character
+participant Skill
 
-Jogador->>Batalha: Escolhe atacar
-Batalha->>Personagem: atacar()
-Personagem->>Habilidade: Consulta dano e custo
-Habilidade-->>Personagem: Retorna valores
-Personagem->>Personagem: Consome mana
-Personagem->>Personagem: Calcula dano
-Personagem->>Personagem: Aplica dano no alvo
-Personagem-->>Batalha: Atualiza atributos
-Batalha-->>Jogador: Exibe novo status
+Player->>Battle: Select Attack
+Battle->>Character: attack()
+Character->>Skill: Get attack data
+Skill-->>Character: Return values
+Character->>Character: Consume mana
+Character->>Character: Calculate damage
+Character->>Character: Apply damage
+Character-->>Battle: Update status
+Battle-->>Player: Display battle status
 ```
 
 ---
 
-# 📂 Estrutura do Projeto
+# 📂 Project Structure
 
 ```text
-Turn-game/
+turn-based-battle-game/
 │
 ├── README.md
+├── LICENSE
+├── .gitignore
 │
-└── game/
-    ├── main.cpp
-    ├── Batalha.cpp
-    ├── Batalha.hpp
-    ├── Personagem.cpp
-    ├── Personagem.hpp
-    ├── Habilidade.cpp
-    ├── Habilidade.hpp
-    └── Makefile
+├── Battle.cpp
+├── Battle.hpp
+│
+├── Character.cpp
+├── Character.hpp
+│
+├── Skill.cpp
+├── Skill.hpp
+│
+└── main.cpp
 ```
 
 ---
 
 # 📚 Classes
 
-## Batalha
+## Battle
 
-Responsável por controlar toda a lógica do combate.
+Responsible for controlling the entire combat flow.
 
-### Principais responsabilidades
+### Responsibilities
 
-- Alternância de turnos.
-- Exibição do estado da batalha.
-- Leitura das ações do jogador.
-- Encerramento da partida.
-
----
-
-## Personagem
-
-Representa um combatente.
-
-### Principais responsabilidades
-
-- Armazenar atributos.
-- Atacar.
-- Defender.
-- Receber dano.
-- Consumir mana.
-- Gerenciar vida e mana.
+- Manage turn order
+- Display battle status
+- Read player actions
+- Finish the battle
 
 ---
 
-## Habilidade
+## Character
 
-Representa uma habilidade utilizável durante o combate.
+Represents a combatant.
 
-### Principais responsabilidades
+### Responsibilities
 
-- Nome.
-- Valor de ataque.
-- Custo de mana.
-
----
-
-# 💡 Conceitos de POO Aplicados
-
-| Conceito | Aplicação |
-|----------|-----------|
-| Encapsulamento | Todos os atributos privados acessados por getters e setters. |
-| Associação | A classe `Batalha` trabalha com objetos `Personagem`. |
-| Composição | Cada `Personagem` possui um conjunto de `Habilidade`. |
-| Abstração | Cada classe representa uma entidade específica do domínio. |
-| Const | Métodos que não alteram estado e parâmetros constantes. |
-| Referências | Evitam cópias de objetos durante o combate. |
+- Store character attributes
+- Attack
+- Defend
+- Receive damage
+- Consume mana
+- Manage health and mana
 
 ---
 
-# 🚀 Compilação
+## Skill
+
+Represents an ability that can be used during battle.
+
+### Responsibilities
+
+- Store skill name
+- Store attack value
+- Store mana cost
+- Define skill type
+
+---
+
+# 💡 Object-Oriented Programming Concepts
+
+| Concept | Application |
+|----------|-------------|
+| Encapsulation | Private attributes accessed through getters and controlled methods. |
+| Association | `Battle` coordinates two `Character` objects. |
+| Composition | Each `Character` owns a collection of `Skill` objects. |
+| Abstraction | Each class models a specific entity of the battle system. |
+| Const Correctness | Read-only methods and constant parameters improve code safety. |
+| References | Prevent unnecessary object copies during combat. |
+
+---
+
+# 🚀 Compilation
 
 ```bash
-g++ *.cpp -o jogo
+g++ *.cpp -o game
 ```
 
 ---
 
-# ▶️ Execução
+# ▶️ Run
 
 ```bash
-./jogo
+./game
 ```
 
 ---
 
-# 💻 Exemplo
+# 💻 Example Output
 
 ```text
 =====================================
-         A LUTA COMEÇA!
+         BATTLE STARTS!
 =====================================
 
-========== STATUS DA BATALHA ==========
+========== BATTLE STATUS ==========
 
-Arcanjo
-[====================] 100 HP
-[********************] 100 MP
+Archangel
+HP [====================] 100
+MP [********************] 60
 
 Leviathan
-[====================] 100 HP
-[********************] 100 MP
+HP [====================] 100
+MP [********************] 70
 
-=======================================
+=====================================
 ```
 
 ---
 
-# 🔮 Melhorias Futuras
+# 🔮 Future Improvements
 
-- [ ] Interface gráfica.
-- [ ] Sistema de inventário.
-- [ ] Efeitos de status.
-- [ ] Inteligência Artificial.
-- [ ] Sons.
-- [ ] Animações.
-- [ ] Sistema de níveis.
-- [ ] Novas habilidades.
-- [ ] Salvamento de progresso.
+- [ ] Graphical interface (SDL3)
+- [ ] Inventory system
+- [ ] Status effects
+- [ ] Artificial Intelligence
+- [ ] Sound effects
+- [ ] Animations
+- [ ] Level progression
+- [ ] Additional skills
+- [ ] Save and load system
 
 ---
 
-# 📄 Licença
+# 🛠️ Technologies
 
-Projeto desenvolvido para fins de estudo e prática de Programação Orientada a Objetos em C++.
+- C++17
+- Object-Oriented Programming
+- GNU G++
+- Makefile
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more information.
