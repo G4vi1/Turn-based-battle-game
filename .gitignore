@@ -1,2 +1,22 @@
+# VS Code settings
 .vscode/
-jogo
+
+# CMake build files
+build/
+
+# Compiled executables
+game
+*.exe
+
+# Object files
+*.o
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Temporary files
+*.tmp
+*.log
