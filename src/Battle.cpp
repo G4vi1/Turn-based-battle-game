@@ -1,6 +1,7 @@
 #include "Battle.hpp"
 #include <iostream>
 #include <vector>
+#include "Actions/Actions.hpp"
 
 using namespace std;
 
@@ -8,7 +9,21 @@ using namespace std;
 // Initializes the battle by defining the two combatants.
 
 Battle::Battle(Character& hero, Character& enemy)
-    : hero(hero), enemy(enemy) {
+    : hero(hero), enemy(enemy)
+{
+    actions.push_back(new AttackAction());
+    actions.push_back(new DefendAction());
+}
+
+// Destructor
+// Cleans up the dynamically allocated actions.
+
+Battle::~Battle()
+{
+    for (auto action : actions)
+    {
+        delete action;
+    }
 }
 
 // Draws the health and mana bars.
@@ -133,32 +148,39 @@ void Battle::start() {
 
 // Displays the action menu and returns the player's choice.
 
-int Battle::menu() {
-
+int Battle::menu()
+{
     int choice;
 
-    // Repeats until the player enters a valid option.
+    do
+    {
+        cout << "\nChoose an action:\n";
 
-    do {
+        // Displays all registered actions dynamically.
 
-        // Displays the available actions.
-
-        cout << "\n-------------------------------------\n"
-             << "[ 1 ] Attack\n"
-             << "[ 2 ] Defend\n"
-             << "-------------------------------------\n";
+        for (int i = 0; i < (int)actions.size(); i++)
+        {
+            cout << i
+                 << " - "
+                 << actions[i]->getName()
+                 << "\n";
+        }
 
         cin >> choice;
 
-    } while (choice != 1 && choice != 2);
+        if (choice < 0 || choice >= (int)actions.size())
+        {
+            cout << "\nInvalid option!\n";
+        }
+
+    } while (choice < 0 || choice >= (int)actions.size());
 
     return choice;
 }
-
 // Executes a single turn for the attacking character.
 
-bool Battle::turn(Character& attacker, Character& defender) {
-
+bool Battle::turn(Character& attacker, Character& defender)
+{
     // Displays the turn header.
 
     cout << "\n=====================================\n"
@@ -169,88 +191,13 @@ bool Battle::turn(Character& attacker, Character& defender) {
 
     displayStatus();
 
-    // Asks the player to choose an action.
+    // Prompts the player to choose an action.
 
-    int choice = menu();
+    int index = menu();
 
-    // Attack option.
+    // Executes the selected action.
 
-    if (choice == 1) {
-
-        // Retrieves the attacker's skills and prompts the player
-        // to choose a valid one.
-
-        const vector<Skill>& skills = attacker.getSkills();
-        int index;
-
-        // Displays the available skills.
-
-        do {
-
-            cout << "\nChoose a skill:\n";
-
-            for (int i = 0; i < (int)skills.size(); i++) {
-                cout << i << " - " << skills[i].getName() << "\n";
-            }
-
-            cin >> index;
-
-            // Checks whether the selected index is valid.
-
-            if (index < 0 || index >= (int)skills.size()) {
-
-                cout << "\nInvalid skill!\n\n";
-
-            }
-
-            // Checks whether the attacker has enough mana.
-
-            else if (!attacker.hasEnoughMana(skills[index].getManaCost())) {
-
-                cout << "\nNot enough mana!\n"
-                     << "Current mana: " << attacker.getMana()
-                     << " | Cost: " << skills[index].getManaCost()
-                     << "\n";
-            }
-
-            // Repeats until a valid skill can be used.
-
-        } while (index < 0
-              || index >= (int)skills.size()
-              || !attacker.hasEnoughMana(skills[index].getManaCost()));
-
-        // Executes the attack.
-
-        attacker.attack(defender, skills[index]);
-
-        // Displays the attack result.
-
-        cout << "\n"
-             << attacker.getName() << " used "
-             << skills[index].getName() << "!\n\n"
-             << defender.getName() << " now has "
-             << defender.getHealth() << " HP.\n";
-
-        // Removes the defender's defensive state.
-
-        defender.resetDefense();
-
-    }
-
-    // Defense option.
-
-    else {
-
-        // Activates the defensive state.
-
-        attacker.defend();
-
-        // Displays the chosen action.
-
-        cout << "\n"
-             << attacker.getName()
-             << " is now defending!\n";
-    }
+    actions[index]->execute(attacker, defender);
 
     // Returns whether the defender has been defeated.
 

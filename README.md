@@ -1,14 +1,23 @@
 # ⚔️ Turn-Based Battle Game
 
-> A turn-based battle game developed in **C++**, focused on applying Object-Oriented Programming concepts and clean software design.
+> A turn-based battle game developed in **C++**, focused on applying Object-Oriented Programming principles, clean software architecture, and extensible game design.
 
 ---
 
 # 📖 Overview
 
-This project implements a turn-based combat system using Object-Oriented Programming principles. Each class has a single responsibility, making the code modular, maintainable, and easy to extend.
+This project implements a modular turn-based combat system using Object-Oriented Programming concepts.
 
-The project was created as a study of OOP concepts such as encapsulation, composition, association, const correctness, and object interaction.
+The architecture separates the responsibilities of the battle controller, characters, skills, and player actions, making the project easier to maintain and extend.
+
+The project was created as a study of:
+
+- Object-Oriented Programming
+- SOLID principles (especially Single Responsibility)
+- Polymorphism
+- Dynamic dispatch
+- Clean software architecture
+- Modern C++ practices
 
 ---
 
@@ -23,6 +32,7 @@ The project was created as a study of OOP concepts such as encapsulation, compos
 - Visual MP bars
 - Battle status displayed every turn
 - Automatic winner detection
+- Action system using polymorphism
 
 ---
 
@@ -41,34 +51,34 @@ C --> D[Choose Action]
 
 D --> E{Attack?}
 
-E -- Yes --> F[Choose Skill]
+E -- Yes --> F[AttackAction]
 
-F --> G{Enough Mana?}
+F --> G[Choose Skill]
 
-G -- No --> F
+G --> H{Enough Mana?}
 
-G -- Yes --> H[Execute Attack]
+H -- No --> G
 
-H --> I[Update HP]
+H -- Yes --> I[Character Attack]
 
-E -- No --> J[Activate Defense]
+E -- No --> J[DefendAction]
 
-I --> K{Opponent Alive?}
+I --> K[Update HP]
 
 J --> K
 
-K -- Yes --> L[Opponent Turn]
+K --> L{Opponent Alive?}
 
-L --> C
+L -- Yes --> M[Opponent Turn]
 
-K -- No --> M[Battle Ends]
+M --> C
+
+L -- No --> N[Battle Ends]
 ```
 
 ---
 
 # 🏛️ Architecture
-
-The project is divided into three main classes, each responsible for a specific part of the battle system.
 
 ```mermaid
 classDiagram
@@ -95,9 +105,44 @@ class Skill{
 +manaCost
 }
 
-Battle --> Character : controls
-Character --> Skill : uses
+class Action{
+<<abstract>>
++execute()
++getName()
+}
+
+class AttackAction
+class DefendAction
+
+Action <|-- AttackAction
+Action <|-- DefendAction
+
+Battle --> Character
+Battle --> Action
+Character --> Skill
 ```
+
+---
+
+# ⚔️ Action System
+
+The project uses an abstract **Action** class to represent any action that can be executed during a character's turn.
+
+Each concrete action encapsulates its own behavior.
+
+Current implementations:
+
+- AttackAction
+- DefendAction
+
+This architecture allows new actions to be added without modifying the battle flow.
+
+Future actions may include:
+
+- ItemAction
+- EscapeAction
+- MagicAction
+- SummonAction
 
 ---
 
@@ -108,17 +153,20 @@ sequenceDiagram
 
 participant Player
 participant Battle
+participant AttackAction
 participant Character
 participant Skill
 
 Player->>Battle: Select Attack
-Battle->>Character: attack()
-Character->>Skill: Get attack data
-Skill-->>Character: Return values
+Battle->>AttackAction: execute()
+AttackAction->>Player: Choose Skill
+AttackAction->>Character: attack()
+Character->>Skill: Read skill data
+Skill-->>Character: Attack values
 Character->>Character: Consume mana
 Character->>Character: Calculate damage
 Character->>Character: Apply damage
-Character-->>Battle: Update status
+Character-->>Battle: Updated state
 Battle-->>Player: Display battle status
 ```
 
@@ -129,20 +177,34 @@ Battle-->>Player: Display battle status
 ```text
 turn-based-battle-game/
 │
+├── CMakeLists.txt
 ├── README.md
 ├── LICENSE
 ├── .gitignore
 │
-├── Battle.cpp
-├── Battle.hpp
+├── include/
+│   ├── Battle.hpp
+│   ├── Character.hpp
+│   ├── Skill.hpp
+│   │
+│   └── Actions/
+│       ├── Action.hpp
+│       ├── Actions.hpp
+│       ├── AttackAction.hpp
+│       └── DefendAction.hpp
 │
-├── Character.cpp
-├── Character.hpp
+├── src/
+│   ├── Battle.cpp
+│   ├── Character.cpp
+│   ├── Skill.cpp
+│   ├── Game.cpp
+│   ├── main.cpp
+│   │
+│   └── Actions/
+│       ├── AttackAction.cpp
+│       └── DefendAction.cpp
 │
-├── Skill.cpp
-├── Skill.hpp
-│
-└── main.cpp
+└── build/
 ```
 
 ---
@@ -151,13 +213,14 @@ turn-based-battle-game/
 
 ## Battle
 
-Responsible for controlling the entire combat flow.
+Controls the combat flow.
 
 ### Responsibilities
 
 - Manage turn order
 - Display battle status
 - Read player actions
+- Execute selected actions
 - Finish the battle
 
 ---
@@ -179,7 +242,7 @@ Represents a combatant.
 
 ## Skill
 
-Represents an ability that can be used during battle.
+Represents a combat ability.
 
 ### Responsibilities
 
@@ -190,23 +253,70 @@ Represents an ability that can be used during battle.
 
 ---
 
+## Action
+
+Abstract base class representing any executable battle action.
+
+### Responsibilities
+
+- Provide a common interface
+- Enable runtime polymorphism
+- Allow new actions without modifying Battle
+
+---
+
+## AttackAction
+
+Concrete implementation responsible for:
+
+- Displaying available skills
+- Validating skill selection
+- Validating mana
+- Executing attacks
+
+---
+
+## DefendAction
+
+Concrete implementation responsible for:
+
+- Activating the defensive state
+
+---
+
 # 💡 Object-Oriented Programming Concepts
 
 | Concept | Application |
 |----------|-------------|
 | Encapsulation | Private attributes accessed through getters and controlled methods. |
-| Association | `Battle` coordinates two `Character` objects. |
-| Composition | Each `Character` owns a collection of `Skill` objects. |
-| Abstraction | Each class models a specific entity of the battle system. |
-| Const Correctness | Read-only methods and constant parameters improve code safety. |
+| Association | Battle coordinates Character objects. |
+| Composition | Character owns a collection of Skill objects. |
+| Abstraction | Action defines a common interface for every action. |
+| Polymorphism | Battle executes actions through Action pointers. |
+| Dynamic Dispatch | AttackAction and DefendAction override execute(). |
+| Const Correctness | Read-only methods improve code safety. |
 | References | Prevent unnecessary object copies during combat. |
 
 ---
 
-# 🚀 Compilation
+# 🚀 Build
+
+Configure the project:
 
 ```bash
-g++ *.cpp -o game
+cmake -S . -B build
+```
+
+Compile:
+
+```bash
+cmake --build build
+```
+
+Clean and rebuild:
+
+```bash
+cmake --build build --clean-first
 ```
 
 ---
@@ -214,7 +324,7 @@ g++ *.cpp -o game
 # ▶️ Run
 
 ```bash
-./game
+./build/game
 ```
 
 ---
@@ -223,7 +333,7 @@ g++ *.cpp -o game
 
 ```text
 =====================================
-         BATTLE STARTS!
+        BATTLE STARTS!
 =====================================
 
 ========== BATTLE STATUS ==========
@@ -244,12 +354,13 @@ MP [********************] 70
 # 🔮 Future Improvements
 
 - [ ] Graphical interface (SDL3)
+- [ ] Artificial Intelligence
 - [ ] Inventory system
 - [ ] Status effects
-- [ ] Artificial Intelligence
 - [ ] Sound effects
 - [ ] Animations
 - [ ] Level progression
+- [ ] Additional actions
 - [ ] Additional skills
 - [ ] Save and load system
 
@@ -258,9 +369,10 @@ MP [********************] 70
 # 🛠️ Technologies
 
 - C++17
-- Object-Oriented Programming
+- CMake
 - GNU G++
-- Makefile
+- Object-Oriented Programming
+- Polymorphism
 
 ---
 

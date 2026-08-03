@@ -8,6 +8,9 @@ add_executable(game
     src/Character.cpp
     src/Skill.cpp
     src/Game.cpp
+
+    src/Actions/AttackAction.cpp
+    src/Actions/DefendAction.cpp
 )
 
 target_include_directories(game PRIVATE include)

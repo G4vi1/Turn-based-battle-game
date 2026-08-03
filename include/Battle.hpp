@@ -2,6 +2,8 @@
 #define BATTLE_HPP
 
 #include "Character.hpp"
+#include "Actions/Action.hpp"
+#include <vector>
 
 using namespace std;
 
@@ -13,6 +15,10 @@ public:
 
     Battle(Character& hero, Character& enemy);
 
+    // Destructor
+
+    ~Battle();
+
     // Public methods
 
     void start();
@@ -23,6 +29,10 @@ private:
 
     Character& hero;
     Character& enemy;
+
+    // Stores the available actions for the battle.
+
+    std::vector<Action*> actions;
 
     // Private methods
 
