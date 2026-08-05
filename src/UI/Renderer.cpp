@@ -68,3 +68,93 @@ bool Renderer::initialize() {
 
     return true;
 }
+
+// Responsible for receiving and handling SDL events, such as user input or window events.
+
+void Renderer::clear()
+{
+    SDL_SetRenderDrawColor(
+        renderer,
+        0,
+        0,
+        0,
+        255
+    );
+
+    SDL_RenderClear(renderer);
+}
+
+// Presents the completed frame.
+//
+// Everything drawn since clear() becomes visible.
+
+void Renderer::present()
+{
+    SDL_RenderPresent(renderer);
+}
+
+// Changes the current drawing color.
+
+void Renderer::setDrawColor(Uint8 r,
+                            Uint8 g,
+                            Uint8 b,
+                            Uint8 a)
+{
+    SDL_SetRenderDrawColor(
+        renderer,
+        r,
+        g,
+        b,
+        a
+    );
+}
+
+// Draws a filled rectangle.
+
+void Renderer::drawFilledRect(float x,
+                              float y,
+                              float width,
+                              float height)
+{
+    // SDL_FRect is SDL's rectangle structure
+    // that stores floating-point coordinates.
+
+    SDL_FRect rect;
+
+    // Defines the rectangle position.
+
+    rect.x = x;
+    rect.y = y;
+
+    // Defines the rectangle dimensions.
+
+    rect.w = width;
+    rect.h = height;
+
+    // Sends the rectangle to SDL so it can be
+    // rendered on the current frame.
+
+    SDL_RenderFillRect(
+        renderer,
+        &rect
+    );
+}
+
+// Responsible for receiving and handling SDL events, such as user input or window events.
+
+void Renderer::shutdown()
+{
+    if (renderer != nullptr)
+    {
+        SDL_DestroyRenderer(renderer);
+        renderer = nullptr;
+    }
+
+    if (window != nullptr)
+    {
+        SDL_DestroyWindow(window);
+        window = nullptr;
+    }
+
+    SDL_Quit();
+}

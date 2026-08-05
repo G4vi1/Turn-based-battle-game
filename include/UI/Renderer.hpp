@@ -23,9 +23,28 @@ class Renderer {
 
         void handleEvents();
 
-        // Clears the screen with a specified color.
+        // Clears the screen with the specified color.
 
-        void draw();
+        void clear();
+
+        // Presents the rendered frame to the window.
+
+        void present();
+
+        void setDrawColor(Uint8 r,
+                      Uint8 g,
+                      Uint8 b,
+                      Uint8 a);
+
+        void drawFilledRect(float x,
+                        float y,
+                        float width,
+                        float height);
+
+
+        // Shuts down the SDL renderer and cleans up resources.
+        
+        void shutdown();
 
     private:
 
