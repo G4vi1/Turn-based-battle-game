@@ -21,9 +21,11 @@ Button::Button(float x,
 // For now, a button is simply a
 // light gray rectangle.
 
+// Draws only the border of a rectangle.
+
 void Button::draw(Renderer& renderer)
 {
-    // Selects the button color.
+    // Draw the button background.
 
     renderer.setDrawColor(
         140,
@@ -32,12 +34,49 @@ void Button::draw(Renderer& renderer)
         255
     );
 
-    // Draws the button body.
-
     renderer.drawFilledRect(
         x,
         y,
         width,
         height
     );
+
+    // Draw the button border.
+
+    renderer.setDrawColor(
+        230,
+        230,
+        230,
+        255
+    );
+
+    renderer.drawRect(
+        x,
+        y,
+        width,
+        height
+    );
+}
+
+bool Button::isClicked(const SDL_Event& event)
+{
+    // Only react to mouse button presses.
+
+    if (event.type != SDL_EVENT_MOUSE_BUTTON_DOWN)
+    {
+        return false;
+    }
+
+    // Mouse position.
+
+    float mouseX = event.button.x;
+    float mouseY = event.button.y;
+
+    // Check if the click happened inside
+    // the button rectangle.
+
+    return mouseX >= x &&
+           mouseX <= x + width &&
+           mouseY >= y &&
+           mouseY <= y + height;
 }

@@ -41,6 +41,13 @@ class Renderer {
                         float width,
                         float height);
 
+        void drawRect(
+            float x,
+            float y,
+            float width,
+            float height
+        );
+
 
         // Shuts down the SDL renderer and cleans up resources.
         

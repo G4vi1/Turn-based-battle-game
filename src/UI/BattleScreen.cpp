@@ -1,9 +1,21 @@
 #include "UI/BattleScreen.hpp"
+#include <iostream>
+
+using namespace std;
 
 // Constructor
 
 BattleScreen::BattleScreen(Renderer& renderer)
-    : renderer(renderer) {
+    : renderer(renderer),
+
+      attackButton(80, 555, 220, 90),
+
+      skillButton(340, 555, 220, 90),
+
+      itemButton(600, 555, 220, 90),
+
+      defendButton(860, 555, 220, 90)
+{
 }
 
 void BattleScreen::draw()
@@ -17,6 +29,8 @@ void BattleScreen::draw()
     drawEnemyPanel();
 
     drawActionPanel();
+
+    drawActionSlots();
 
     // Displays the completed frame.
 
@@ -102,51 +116,38 @@ void BattleScreen::drawActionPanel()
     );
 }
 
+void BattleScreen::handleEvent(const SDL_Event& event)
+{
+    if (attackButton.isClicked(event))
+    {
+        cout << "Attack pressed!\n";
+    }
+
+    if (skillButton.isClicked(event))
+    {
+        cout << "Skill pressed!\n";
+    }
+
+    if (itemButton.isClicked(event))
+    {
+        cout << "Item pressed!\n";
+    }
+
+    if (defendButton.isClicked(event))
+    {
+        cout << "Defend pressed!\n";
+    }
+}
+
 // Draws the action slots, even for future ones.
 
 void BattleScreen::drawActionSlots()
 {
+    attackButton.draw(renderer);
 
-    renderer.setDrawColor(
-        140,
-        140,
-        140,
-        255
-    );
+    skillButton.draw(renderer);
 
-    // Attack slot
+    itemButton.draw(renderer);
 
-    renderer.drawFilledRect(
-        80,
-        555,
-        220,
-        90
-    );
-
-    // Skill slot
-
-    renderer.drawFilledRect(
-        340,
-        555,
-        220,
-        90
-    );
-
-    // Item slot
-
-    renderer.drawFilledRect(
-        600,
-        555,
-        220,
-        90
-    );
-
-    // Defend slot
-
-    renderer.drawFilledRect(
-        860,
-        555,
-        220,
-        90
-    );
+    defendButton.draw(renderer);
 }

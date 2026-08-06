@@ -8,7 +8,12 @@ using namespace std;
 
 int main()
 {
+    // Creates the renderer responsible for
+    // communicating with SDL.
+
     Renderer renderer;
+
+    // Initializes SDL, the window and the renderer.
 
     if (!renderer.initialize())
     {
@@ -16,26 +21,46 @@ int main()
         return 1;
     }
 
+    // Creates the battle screen.
+    // It will be responsible for drawing
+    // the entire battle interface.
+
     BattleScreen battleScreen(renderer);
+
+    // Main application loop control.
 
     bool running = true;
 
     SDL_Event event;
 
+    // Main loop.
+
     while (running)
     {
-        // Process SDL events.
+        // Processes every SDL event generated
+        // since the previous frame.
+
         while (SDL_PollEvent(&event))
         {
+            // Closes the application.
+
             if (event.type == SDL_EVENT_QUIT)
             {
                 running = false;
             }
+
+            // Lets the BattleScreen process
+            // mouse clicks and future keyboard input.
+
+            battleScreen.handleEvent(event);
         }
 
-        // Draw the current battle screen.
+        // Draws the entire battle screen.
+
         battleScreen.draw();
     }
+
+    // Releases SDL resources.
 
     renderer.shutdown();
 

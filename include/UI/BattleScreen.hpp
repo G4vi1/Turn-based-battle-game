@@ -2,6 +2,8 @@
 #define BATTLE_SCREEN_HPP
 
 #include "Renderer.hpp"
+#include "Button.hpp"
+#include <SDL3/SDL.h>
 
 class BattleScreen
 {
@@ -14,6 +16,8 @@ public:
     // Draws the entire battle screen.
 
     void draw();
+
+    void handleEvent(const SDL_Event& event);
 
 private:
 
@@ -28,6 +32,15 @@ private:
     void drawActionSlots();
 
     Renderer& renderer;
+
+    Button attackButton;
+
+    Button skillButton;
+
+    Button defendButton;
+
+    Button itemButton;
+
 };
 
 #endif

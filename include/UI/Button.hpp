@@ -18,6 +18,8 @@ public:
 
     void draw(Renderer& renderer);
 
+    bool isClicked(const SDL_Event& event);
+
 private:
 
     // Button position.

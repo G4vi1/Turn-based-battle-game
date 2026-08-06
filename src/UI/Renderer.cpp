@@ -140,6 +140,30 @@ void Renderer::drawFilledRect(float x,
     );
 }
 
+// Draws only the border of a rectangle.
+
+void Renderer::drawRect(
+    float x,
+    float y,
+    float width,
+    float height
+)
+{
+    SDL_FRect rect =
+    {
+        x,
+        y,
+        width,
+        height
+    };
+
+    SDL_RenderRect(
+        renderer,
+        &rect
+    );
+}
+
+
 // Responsible for receiving and handling SDL events, such as user input or window events.
 
 void Renderer::shutdown()
