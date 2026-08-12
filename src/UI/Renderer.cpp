@@ -1,173 +1,55 @@
-#include "UI/Renderer.hpp"
-#include <iostream>
+#include "Renderer.hpp"
 
-// Constructor
-
-Renderer::Renderer()
-    : window(nullptr), renderer(nullptr) {
-}
-
-//Destructor
-
-Renderer::~Renderer() {
-
-    // Cleans up the SDL resources.
-
-    if(renderer != nullptr)
+bool Renderer::initialize()
+{
+    if (!SDL_Init(SDL_INIT_VIDEO))
     {
-        SDL_DestroyRenderer(renderer);
-    }
-
-    if(window != nullptr)
-    {
-        SDL_DestroyWindow(window);
-    }
-
-    SDL_Quit();
-
-}
-
-// Initializes the SDL renderer.
-
-bool Renderer::initialize() {
-
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         return false;
     }
 
-
-    //Creates the SDL window and renderer.
+    if (!TTF_Init())
+    {
+        SDL_Quit();
+        return false;
+    }
 
     window = SDL_CreateWindow(
-        "Turn-Based Battle Game",
-        1280, // Width
-        720,  // Height
-        0     // Flags
+        "Turn Based Battle Game",
+        1280,
+        720,
+        0
     );
 
-    //Verifies if the window was created successfully.
-
-    if(window == nullptr)
+    if (window == nullptr)
     {
+        TTF_Quit();
+        SDL_Quit();
         return false;
     }
 
-    //Creates the SDL renderer.
+    renderer = SDL_CreateRenderer(window, nullptr);
 
-    renderer = SDL_CreateRenderer(
-        window, //This arguments appoints that this renderer in specific will be used to render the window created above.
-        nullptr //Somehow this argument is used to choose the best rendering driver available.
-    );
-
-//Verifies if the renderer was created successfully.
-
-    if(renderer == nullptr)
+    if (renderer == nullptr)
     {
+        SDL_DestroyWindow(window);
+        window = nullptr;
+
+        TTF_Quit();
+        SDL_Quit();
         return false;
     }
 
     return true;
 }
 
-// Responsible for receiving and handling SDL events, such as user input or window events.
-
-void Renderer::clear()
-{
-    SDL_SetRenderDrawColor(
-        renderer,
-        0,
-        0,
-        0,
-        255
-    );
-
-    SDL_RenderClear(renderer);
-}
-
-// Presents the completed frame.
-//
-// Everything drawn since clear() becomes visible.
-
-void Renderer::present()
-{
-    SDL_RenderPresent(renderer);
-}
-
-// Changes the current drawing color.
-
-void Renderer::setDrawColor(Uint8 r,
-                            Uint8 g,
-                            Uint8 b,
-                            Uint8 a)
-{
-    SDL_SetRenderDrawColor(
-        renderer,
-        r,
-        g,
-        b,
-        a
-    );
-}
-
-// Draws a filled rectangle.
-
-void Renderer::drawFilledRect(float x,
-                              float y,
-                              float width,
-                              float height)
-{
-    // SDL_FRect is SDL's rectangle structure
-    // that stores floating-point coordinates.
-
-    SDL_FRect rect;
-
-    // Defines the rectangle position.
-
-    rect.x = x;
-    rect.y = y;
-
-    // Defines the rectangle dimensions.
-
-    rect.w = width;
-    rect.h = height;
-
-    // Sends the rectangle to SDL so it can be
-    // rendered on the current frame.
-
-    SDL_RenderFillRect(
-        renderer,
-        &rect
-    );
-}
-
-// Draws only the border of a rectangle.
-
-void Renderer::drawRect(
-    float x,
-    float y,
-    float width,
-    float height
-)
-{
-    SDL_FRect rect =
-    {
-        x,
-        y,
-        width,
-        height
-    };
-
-    SDL_RenderRect(
-        renderer,
-        &rect
-    );
-}
-
-
-// Responsible for receiving and handling SDL events, such as user input or window events.
-
 void Renderer::shutdown()
 {
+    if (font != nullptr)
+    {
+        TTF_CloseFont(font);
+        font = nullptr;
+    }
+
     if (renderer != nullptr)
     {
         SDL_DestroyRenderer(renderer);
@@ -180,5 +62,134 @@ void Renderer::shutdown()
         window = nullptr;
     }
 
+    TTF_Quit();
     SDL_Quit();
+}
+
+void Renderer::clear()
+{
+    SDL_RenderClear(renderer);
+}
+
+void Renderer::present()
+{
+    SDL_RenderPresent(renderer);
+}
+
+void Renderer::setDrawColor(
+    Uint8 r,
+    Uint8 g,
+    Uint8 b,
+    Uint8 a
+)
+{
+    SDL_SetRenderDrawColor(
+        renderer,
+        r,
+        g,
+        b,
+        a
+    );
+}
+
+void Renderer::drawFilledRect(
+    float x,
+    float y,
+    float width,
+    float height
+)
+{
+    SDL_FRect rect{
+        x,
+        y,
+        width,
+        height
+    };
+
+    SDL_RenderFillRect(
+        renderer,
+        &rect
+    );
+}
+
+void Renderer::drawRect(
+    float x,
+    float y,
+    float width,
+    float height
+)
+{
+    SDL_FRect rect{
+        x,
+        y,
+        width,
+        height
+    };
+
+    SDL_RenderRect(
+        renderer,
+        &rect
+    );
+}
+
+void Renderer::drawText(
+    const char* text,
+    float x,
+    float y,
+    float size
+)
+{
+    if (font == nullptr)
+    {
+        return;
+    }
+
+    SDL_Color color{
+        255,
+        255,
+        255,
+        255
+    };
+
+    SDL_Surface* surface =
+        TTF_RenderText_Blended(
+            font,
+            text,
+            0,
+            color
+        );
+
+    if (surface == nullptr)
+    {
+        return;
+    }
+
+    SDL_Texture* texture =
+        SDL_CreateTextureFromSurface(
+            renderer,
+            surface
+        );
+
+    if (texture == nullptr)
+    {
+        SDL_DestroySurface(surface);
+        return;
+    }
+
+    SDL_FRect destination{
+        x,
+        y,
+        static_cast<float>(surface->w),
+        static_cast<float>(surface->h)
+    };
+
+    SDL_RenderTexture(
+        renderer,
+        texture,
+        nullptr,
+        &destination
+    );
+
+    SDL_DestroyTexture(texture);
+    SDL_DestroySurface(surface);
 }

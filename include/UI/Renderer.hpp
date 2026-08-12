@@ -1,69 +1,72 @@
-#pragma once
+#ifndef RENDERER_HPP
+#define RENDERER_HPP
 
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
-class Renderer {
+class Renderer
+{
+public:
 
-    public:
+    // Initializes SDL, the window and the renderer.
 
-        // Constructor
+    bool initialize();
 
-        Renderer();
+    // Shuts down SDL and releases resources.
 
+    void shutdown();
 
-        // Destructor
+    // Clears the current frame.
 
-        ~Renderer();
+    void clear();
 
-        // Initializes the SDL renderer.
+    // Displays the current frame.
 
-        bool initialize();
+    void present();
 
-        //Responsible for receiving and handling SDL events, such as user input or window events.
+    // Sets the drawing color.
 
-        void handleEvents();
+    void setDrawColor(
+        Uint8 r,
+        Uint8 g,
+        Uint8 b,
+        Uint8 a
+    );
 
-        // Clears the screen with the specified color.
+    // Draws a filled rectangle.
 
-        void clear();
+    void drawFilledRect(
+        float x,
+        float y,
+        float width,
+        float height
+    );
 
-        // Presents the rendered frame to the window.
+    // Draws the border of a rectangle.
 
-        void present();
+    void drawRect(
+        float x,
+        float y,
+        float width,
+        float height
+    );
 
-        void setDrawColor(Uint8 r,
-                      Uint8 g,
-                      Uint8 b,
-                      Uint8 a);
+    // Draws text on the screen.
 
-        void drawFilledRect(float x,
-                        float y,
-                        float width,
-                        float height);
+    void drawText(
+        const char* text,
+        float x,
+        float y,
+        float size
+    );
 
-        void drawRect(
-            float x,
-            float y,
-            float width,
-            float height
-        );
+private:
 
+    SDL_Window* window = nullptr;
 
-        // Shuts down the SDL renderer and cleans up resources.
-        
-        void shutdown();
+    SDL_Renderer* renderer = nullptr;
 
-    private:
-
-        //Window
-
-        SDL_Window* window;
-
-        //Renderer
-
-        SDL_Renderer* renderer;
-
-
-
-
+    TTF_Font* font = nullptr;
 };
+
+#endif

@@ -18,7 +18,8 @@ RUN apt-get update
 RUN apt-get install -y \
     build-essential \
     cmake \
-    libsdl3-dev
+    libsdl3-dev \
+    libsdl3-ttf-dev
 
 # Set the working directory inside the container.
 #

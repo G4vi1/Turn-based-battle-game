@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(TurnBasedBattleGame)
 
 find_package(SDL3 REQUIRED)
+find_package(SDL3_ttf REQUIRED)
 
 add_executable(game
     src/main.cpp
@@ -20,4 +21,7 @@ add_executable(game
 )
 
 target_include_directories(game PRIVATE include)
-target_link_libraries(game PRIVATE SDL3::SDL3)
+target_link_libraries(game PRIVATE
+    SDL3::SDL3
+    SDL3_ttf::SDL3_ttf
+)
