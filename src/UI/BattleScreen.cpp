@@ -7,14 +7,10 @@ using namespace std;
 
 BattleScreen::BattleScreen(Renderer& renderer)
     : renderer(renderer),
-
-      attackButton(80, 555, 220, 90),
-
-      skillButton(340, 555, 220, 90),
-
-      itemButton(600, 555, 220, 90),
-
-      defendButton(860, 555, 220, 90)
+      attackButton(80, 555, 220, 90, "ATTACK"),
+      skillButton(340, 555, 220, 90, "SKILL"),
+      itemButton(600, 555, 220, 90, "ITEM"),
+      defendButton(860, 555, 220, 90, "DEFEND")
 {
 }
 
@@ -118,24 +114,57 @@ void BattleScreen::drawActionPanel()
 
 void BattleScreen::handleEvent(const SDL_Event& event)
 {
-    if (attackButton.isClicked(event))
+    if (event.type == SDL_EVENT_MOUSE_MOTION)
     {
-        cout << "Attack pressed!\n";
+        float mouseX = event.motion.x;
+        float mouseY = event.motion.y;
+
+        attackButton.setHovered(
+            attackButton.isHovered(mouseX, mouseY)
+        );
+
+        skillButton.setHovered(
+            skillButton.isHovered(mouseX, mouseY)
+        );
+
+        itemButton.setHovered(
+            itemButton.isHovered(mouseX, mouseY)
+        );
+
+        defendButton.setHovered(
+            defendButton.isHovered(mouseX, mouseY)
+        );
     }
 
-    if (skillButton.isClicked(event))
+    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
     {
-        cout << "Skill pressed!\n";
+        if (attackButton.isClicked(event))
+        {
+            attackButton.setPressed(true);
+        }
+
+        if (skillButton.isClicked(event))
+        {
+            skillButton.setPressed(true);
+        }
+
+        if (itemButton.isClicked(event))
+        {
+            itemButton.setPressed(true);
+        }
+
+        if (defendButton.isClicked(event))
+        {
+            defendButton.setPressed(true);
+        }
     }
 
-    if (itemButton.isClicked(event))
+    if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
     {
-        cout << "Item pressed!\n";
-    }
-
-    if (defendButton.isClicked(event))
-    {
-        cout << "Defend pressed!\n";
+        attackButton.setPressed(false);
+        skillButton.setPressed(false);
+        itemButton.setPressed(false);
+        defendButton.setPressed(false);
     }
 }
 

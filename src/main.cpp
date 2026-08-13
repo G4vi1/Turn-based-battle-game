@@ -40,17 +40,11 @@ int main()
         // Processes every SDL event generated
         // since the previous frame.
 
-        while (SDL_PollEvent(&event))
-        {
-            // Closes the application.
-
-            if (event.type == SDL_EVENT_QUIT)
-            {
+        while (SDL_PollEvent(&event)){
+        
+            if (event.type == SDL_EVENT_QUIT){
                 running = false;
             }
-
-            // Lets the BattleScreen process
-            // mouse clicks and future keyboard input.
 
             battleScreen.handleEvent(event);
         }

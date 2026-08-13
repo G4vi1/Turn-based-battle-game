@@ -1,4 +1,4 @@
-#include "Renderer.hpp"
+#include "UI/Renderer.hpp"
 
 bool Renderer::initialize()
 {
@@ -29,8 +29,26 @@ bool Renderer::initialize()
 
     renderer = SDL_CreateRenderer(window, nullptr);
 
-    if (renderer == nullptr)
-    {
+    if (renderer == nullptr){   
+        SDL_DestroyWindow(window);
+        window = nullptr;
+
+        TTF_Quit();
+        SDL_Quit();
+        return false;
+    }
+
+// Load the font.
+
+    font = TTF_OpenFont(
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    32
+    );
+
+    if (font == nullptr) {
+        SDL_DestroyRenderer(renderer);
+        renderer = nullptr;
+
         SDL_DestroyWindow(window);
         window = nullptr;
 

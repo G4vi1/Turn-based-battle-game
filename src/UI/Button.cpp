@@ -2,37 +2,64 @@
 
 // Constructor.
 //
-// Stores the position and dimensions
-// of the button.
+// Stores the position, dimensions,
+// and text of the button.
 
 Button::Button(float x,
                float y,
                float width,
-               float height)
+               float height,
+               const char* text)
     : x(x),
       y(y),
       width(width),
-      height(height)
+      height(height),
+      text(text)
 {
 }
 
 // Draws the button.
 //
-// For now, a button is simply a
-// light gray rectangle.
-
-// Draws only the border of a rectangle.
+// The button changes its appearance
+// depending on its current state.
 
 void Button::draw(Renderer& renderer)
 {
     // Draw the button background.
 
-    renderer.setDrawColor(
-        140,
-        140,
-        140,
-        255
-    );
+    if (pressed)
+    {
+        // Button is being pressed.
+
+        renderer.setDrawColor(
+            100,
+            100,
+            100,
+            255
+        );
+    }
+    else if (hovered)
+    {
+        // Mouse is over the button.
+
+        renderer.setDrawColor(
+            180,
+            180,
+            180,
+            255
+        );
+    }
+    else
+    {
+        // Normal button state.
+
+        renderer.setDrawColor(
+            140,
+            140,
+            140,
+            255
+        );
+    }
 
     renderer.drawFilledRect(
         x,
@@ -56,7 +83,18 @@ void Button::draw(Renderer& renderer)
         width,
         height
     );
+
+    // Draw the button text.
+
+    renderer.drawText(
+        text,
+        x + 20,
+        y + 20,
+        32
+    );
 }
+
+// Checks whether the button was clicked.
 
 bool Button::isClicked(const SDL_Event& event)
 {
@@ -79,4 +117,28 @@ bool Button::isClicked(const SDL_Event& event)
            mouseX <= x + width &&
            mouseY >= y &&
            mouseY <= y + height;
+}
+
+// Checks whether the mouse is over the button.
+
+bool Button::isHovered(float mouseX, float mouseY) const
+{
+    return mouseX >= x &&
+           mouseX <= x + width &&
+           mouseY >= y &&
+           mouseY <= y + height;
+}
+
+// Changes the hover state.
+
+void Button::setHovered(bool hovered)
+{
+    this->hovered = hovered;
+}
+
+// Changes the pressed state.
+
+void Button::setPressed(bool pressed)
+{
+    this->pressed = pressed;
 }

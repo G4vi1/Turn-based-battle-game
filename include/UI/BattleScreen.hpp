@@ -9,11 +9,7 @@ class BattleScreen
 {
 public:
 
-    // Constructor
-
     BattleScreen(Renderer& renderer);
-
-    // Draws the entire battle screen.
 
     void draw();
 
@@ -22,25 +18,17 @@ public:
 private:
 
     void drawBackground();
-
     void drawHeroPanel();
-
     void drawEnemyPanel();
-
     void drawActionPanel();
-
     void drawActionSlots();
 
     Renderer& renderer;
 
     Button attackButton;
-
     Button skillButton;
-
     Button defendButton;
-
     Button itemButton;
-
 };
 
 #endif
