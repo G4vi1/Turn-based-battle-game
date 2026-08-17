@@ -65,6 +65,8 @@ public:
     void attack(Character& target, const Skill& skill);
 
     void addSkill(const Skill& skill);
+
+    void setHealth(double health);
 };
 
 #endif

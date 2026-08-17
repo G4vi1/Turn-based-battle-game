@@ -146,3 +146,18 @@ void Character::attack(Character& target, const Skill& skill) {
 
     target.takeDamage(damage);
 }
+
+void Character::setHealth(double health)
+{
+    this->health = health;
+
+    if (this->health < 0)
+    {
+        this->health = 0;
+    }
+
+    if (this->health > maxHealth)
+    {
+        this->health = maxHealth;
+    }
+}

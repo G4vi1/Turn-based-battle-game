@@ -21,11 +21,31 @@ int main()
         return 1;
     }
 
+    Character hero(
+        "Hero",
+        100.0,
+        10.0,
+        10.0,
+        50
+    );
+
+    Character enemy(
+        "Enemy",
+        100.0,
+        5.0,
+        8.0,
+        30
+    );
+
     // Creates the battle screen.
     // It will be responsible for drawing
     // the entire battle interface.
 
-    BattleScreen battleScreen(renderer);
+    BattleScreen battleScreen(
+        renderer,
+        hero,
+        enemy
+    );
 
     // Main application loop control.
 

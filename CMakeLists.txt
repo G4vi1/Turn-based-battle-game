@@ -18,6 +18,7 @@ add_executable(game
     src/UI/Renderer.cpp
     src/UI/BattleScreen.cpp
     src/UI/Button.cpp
+    src/UI/HealthBar.cpp
 )
 
 target_include_directories(game PRIVATE include)
