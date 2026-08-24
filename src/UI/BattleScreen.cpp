@@ -16,14 +16,13 @@ BattleScreen::BattleScreen(
       hero(hero),
       enemy(enemy),
       skillButton(190, 555, 280, 90, "SKILL"),
-      skill1Button(80, 545, 250, 70, "SKILL 1"),
-      skill2Button(345, 545, 250, 70, "SKILL 2"),
-      skill3Button(610, 545, 250, 70, "SKILL 3"),
-      skill4Button(875, 545, 250, 70, "SKILL 4"),
+      skill1Button(70, 560, 350, 80, "SKILL 1"),
+      skill2Button(465, 560, 350, 80, "SKILL 2"),
+      skill3Button(860, 560, 350, 80, "SKILL 3"),
       itemButton(500, 555, 280, 90, "ITEM"),
       defendButton(810, 555, 280, 90, "DEFEND"),
-      heroHealthBar(70, 130, 360, 25, hero.getMaxHealth()),
-      enemyHealthBar(850, 130, 360, 25, enemy.getMaxHealth())
+      heroHealthBar(75, 120, 350, 25, hero.getMaxHealth()),
+      enemyHealthBar(855, 120, 350, 25, enemy.getMaxHealth())
 {
 }
 
@@ -47,11 +46,16 @@ void BattleScreen::draw()
         drawActionSlots();
     }
     else if (state == BattleScreenState::SKILLS){
+
+        skill1Button.setText(hero.getSkills()[0].getName());
+        skill2Button.setText(hero.getSkills()[1].getName());
+        skill3Button.setText(hero.getSkills()[2].getName());
+
         drawSkillPanel();
+
         skill1Button.draw(renderer);
         skill2Button.draw(renderer);
         skill3Button.draw(renderer);
-        skill4Button.draw(renderer);
     }
 
     // Displays the completed frame.
@@ -92,17 +96,17 @@ void BattleScreen::drawHeroPanel()
     );
 
     renderer.drawFilledRect(
-        40,
-        40,
-        420,
-        150
+        50,
+        50,
+        400,
+        140
     );
 
     renderer.drawText(
-        "HERO",
-        70,
-        60,
-        28
+        hero.getName().c_str(),
+        75,
+        65,
+        30
     );
 
     heroHealthBar.draw(renderer);
@@ -114,8 +118,8 @@ void BattleScreen::drawHeroPanel()
 
     renderer.drawText(
         healthText.c_str(),
-        70,
-        165,
+        75,
+        160,
         20
     );
 }
@@ -132,17 +136,17 @@ void BattleScreen::drawEnemyPanel()
     );
 
     renderer.drawFilledRect(
-        820,
-        40,
-        420,
-        150
+        830,
+        50,
+        400,
+        140
     );
 
     renderer.drawText(
-        "ENEMY",
-        850,
-        60,
-        28
+        enemy.getName().c_str(),
+        855,
+        65,
+        30
     );
 
     enemyHealthBar.draw(renderer);
@@ -154,8 +158,8 @@ void BattleScreen::drawEnemyPanel()
 
     renderer.drawText(
         healthText.c_str(),
-        850,
-        165,
+        855,
+        160,
         20
     );
 }
@@ -214,10 +218,6 @@ void BattleScreen::handleEvent(const SDL_Event& event)
             skill3Button.setHovered(
                 skill3Button.isHovered(mouseX, mouseY)
             );
-
-            skill4Button.setHovered(
-                skill4Button.isHovered(mouseX, mouseY)
-            );
         }
     }
 
@@ -257,11 +257,6 @@ void BattleScreen::handleEvent(const SDL_Event& event)
             {
                 skill3Button.setPressed(true);
             }
-
-            if (skill4Button.isClicked(event))
-            {
-                skill4Button.setPressed(true);
-            }
         }
     }
 
@@ -271,7 +266,6 @@ void BattleScreen::handleEvent(const SDL_Event& event)
         skill1Button.setPressed(false);
         skill2Button.setPressed(false);
         skill3Button.setPressed(false);
-        skill4Button.setPressed(false);
         itemButton.setPressed(false);
         defendButton.setPressed(false);
     }

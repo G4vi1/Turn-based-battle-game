@@ -2,6 +2,7 @@
 #define BUTTON_HPP
 
 #include "Renderer.hpp"
+#include <string>
 
 class Button
 {
@@ -13,7 +14,7 @@ public:
            float y,
            float width,
            float height,
-           const char* text);
+           const std::string& text);
 
     // Draws the button.
 
@@ -26,6 +27,10 @@ public:
     void setHovered(bool hovered);
 
     void setPressed(bool pressed);
+
+    // Sets the button text.
+
+    void setText(const std::string& text);
 
 private:
 
@@ -41,7 +46,7 @@ private:
 
     // Button text.
 
-    const char* text;
+    std::string text;
 
     // Checks if the mouse is over the button.
 

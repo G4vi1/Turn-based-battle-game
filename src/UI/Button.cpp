@@ -9,7 +9,7 @@ Button::Button(float x,
                float y,
                float width,
                float height,
-               const char* text)
+               const std::string& text)
     : x(x),
       y(y),
       width(width),
@@ -87,7 +87,7 @@ void Button::draw(Renderer& renderer)
     // Draw the button text.
 
     renderer.drawText(
-        text,
+        text.c_str(),
         x + 20,
         y + 20,
         32
@@ -141,4 +141,9 @@ void Button::setHovered(bool hovered)
 void Button::setPressed(bool pressed)
 {
     this->pressed = pressed;
+}
+
+void Button::setText(const std::string& text)
+{
+    this->text = text;
 }

@@ -21,21 +21,86 @@ int main()
         return 1;
     }
 
+
+    // Creates the hero skills.
+
+    Skill holyStrike(
+        "Holy Strike",
+        SkillType::Physical,
+        10,
+        25.0
+    );
+
+    Skill divineSpear(
+        "Divine Spear",
+        SkillType::Physical,
+        15,
+        35.0
+    );
+
+    Skill healingBlessing(
+        "Healing Blessing",
+        SkillType::Special,
+        20,
+        15.0
+    );
+
+    // Creates the villain skills.
+
+    Skill shadowClaw(
+        "Shadow Claw",
+        SkillType::Physical,
+        8,
+        20.0
+    );
+
+    Skill arcaneBlast(
+        "Arcane Blast",
+        SkillType::Magical,
+        25,
+        45.0
+    );
+
+    Skill devastatingRoar(
+        "Devastating Roar",
+        SkillType::Special,
+        30,
+        50.0
+    );
+
+    //Creates the hero and the villain characters.
+
     Character hero(
-        "Hero",
+        "Archangel",
         100.0,
-        10.0,
-        10.0,
-        50
+        0.8,
+        12,
+        60
     );
 
     Character enemy(
-        "Enemy",
+        "Leviathan",
         100.0,
-        5.0,
-        8.0,
-        30
+        0.4,
+        15,
+        70
     );
+
+    // --------------------------------------------------
+    // Add hero skills
+    // --------------------------------------------------
+
+    hero.addSkill(holyStrike);
+    hero.addSkill(divineSpear);
+    hero.addSkill(healingBlessing);
+
+    // --------------------------------------------------
+    // Add enemy skills
+    // --------------------------------------------------
+
+    enemy.addSkill(shadowClaw);
+    enemy.addSkill(arcaneBlast);
+    enemy.addSkill(devastatingRoar);
 
     // Creates the battle screen.
     // It will be responsible for drawing

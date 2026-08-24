@@ -45,7 +45,6 @@ private:
         Button skill1Button;
         Button skill2Button;
         Button skill3Button;
-        Button skill4Button;
 
     Button defendButton;
     Button itemButton;
