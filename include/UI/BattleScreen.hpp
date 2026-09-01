@@ -28,8 +28,13 @@ private:
     void drawEnemyPanel();
     void drawActionPanel();
     void drawActionSlots();
+    void drawBottom();
+
     HealthBar heroHealthBar;
+    HealthBar heroManaBar;
+
     HealthBar enemyHealthBar;
+    HealthBar enemyManaBar;
 
     Renderer& renderer;
 
@@ -45,9 +50,11 @@ private:
         Button skill1Button;
         Button skill2Button;
         Button skill3Button;
+        Button skill4Button;
 
     Button defendButton;
     Button itemButton;
+    Button backButton;
     
 
     enum class BattleScreenState{

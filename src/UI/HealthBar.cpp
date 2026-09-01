@@ -3,26 +3,28 @@
 // Constructor.
 //
 // Stores the position, dimensions,
-// and maximum health of the bar.
+// maximum value, and color of the bar.
 
 HealthBar::HealthBar(float x,
                      float y,
                      float width,
                      float height,
-                     int maxHealth)
+                     int maxHealth,
+                     SDL_Color color)
     : x(x),
       y(y),
       width(width),
       height(height),
       health(maxHealth),
-      maxHealth(maxHealth)
+      maxHealth(maxHealth),
+      color(color)
 {
 }
 
 // Draws the health bar.
 //
 // The background represents missing health.
-// The filled portion represents current health.
+// The filled portion represents the current value.
 
 void HealthBar::draw(Renderer& renderer)
 {
@@ -56,10 +58,10 @@ void HealthBar::draw(Renderer& renderer)
     // Draw the current health.
 
     renderer.setDrawColor(
-        40,
-        180,
-        70,
-        255
+        color.r,
+        color.g,
+        color.b,
+        color.a
     );
 
     renderer.drawFilledRect(

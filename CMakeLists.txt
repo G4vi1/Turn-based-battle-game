@@ -12,6 +12,8 @@ add_executable(game
     src/Skill.cpp
     src/Game.cpp
 
+    src/GameData/Characters.cpp
+
     src/Actions/AttackAction.cpp
     src/Actions/DefendAction.cpp
 
@@ -19,6 +21,7 @@ add_executable(game
     src/UI/BattleScreen.cpp
     src/UI/Button.cpp
     src/UI/HealthBar.cpp
+    src/UI/BattleScreen.cpp
 )
 
 target_include_directories(game PRIVATE include)

@@ -13,7 +13,8 @@ public:
               float y,
               float width,
               float height,
-              int maxHealth);
+              int maxHealth,
+              SDL_Color color);
 
     // Draws the health bar.
 
@@ -45,6 +46,10 @@ private:
     // Maximum health.
 
     int maxHealth;
+
+    // Health bar color.
+
+    SDL_Color color;
 };
 
 #endif
