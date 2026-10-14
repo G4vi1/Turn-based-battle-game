@@ -16,6 +16,7 @@ constexpr float PANEL_HEIGHT = 140.0f;
 constexpr float ACTION_BUTTON_Y = 582.0f;
 constexpr float SKILL_BUTTON_Y = 550.0f;
 constexpr float SKILL_BUTTON_HEIGHT = 50.0f;
+constexpr Uint64 EFFECT_DURATION_MS = 700;
 }
 
 // Constructor
@@ -48,6 +49,7 @@ BattleScreen::BattleScreen(
       enemyManaBar(70, 162, 250, 15, enemy.getMaxMana(), {150, 50, 200, 255})
 {
     itemButton.setEnabled(false);
+    addBattleLog("Battle started. Archangel's turn.");
     updateSkillButtons();
 }
 
@@ -90,7 +92,9 @@ void BattleScreen::draw(){
         }
     }
 
-    drawBattleMessage();
+    drawTurnIndicator();
+    drawBattleLog();
+    drawBattleEffect();
 
     renderer.present();
 }
@@ -375,12 +379,19 @@ void BattleScreen::performHeroSkill(size_t skillIndex)
     }
 
     battleMessage = heroMessage;
+    addBattleLog(battleMessage);
     state = BattleScreenState::ACTIONS;
+
+    const Skill& selectedSkill = hero.getSkills()[skillIndex];
+    startEffect(selectedSkill.getType() == SkillType::Healing
+                    ? static_cast<int>(VisualEffect::HERO_HEAL)
+                    : static_cast<int>(VisualEffect::ENEMY_HIT));
 
     if (battle.hasEnded())
     {
         state = BattleScreenState::FINISHED;
         battleMessage += enemy.isAlive() ? "  Victory!" : "  Defeat!";
+        addBattleLog(enemy.isAlive() ? "Defeat!" : "Victory!");
     }
     else
     {
@@ -391,17 +402,26 @@ void BattleScreen::performHeroSkill(size_t skillIndex)
 void BattleScreen::performHeroDefense()
 {
     battle.heroDefend(battleMessage);
+    addBattleLog(battleMessage);
+    startEffect(static_cast<int>(VisualEffect::HERO_DEFEND));
     state = BattleScreenState::ENEMY_TURN;
 }
 
 void BattleScreen::performEnemyTurn()
 {
+    const double heroHealthBefore = hero.getHealth();
     battle.enemyTurn(battleMessage);
+    addBattleLog(battleMessage);
+
+    startEffect(hero.getHealth() < heroHealthBefore
+                    ? static_cast<int>(VisualEffect::HERO_HIT)
+                    : static_cast<int>(VisualEffect::ENEMY_DEFEND));
 
     if (battle.hasEnded())
     {
         state = BattleScreenState::FINISHED;
         battleMessage += enemy.isAlive() ? "  Victory!" : "  Defeat!";
+        addBattleLog(enemy.isAlive() ? "Defeat!" : "Victory!");
     }
     else
     {
@@ -413,6 +433,9 @@ void BattleScreen::restartBattle()
 {
     battle.reset();
     battleMessage.clear();
+    battleLog.clear();
+    addBattleLog("Battle restarted. Archangel's turn.");
+    activeEffect = VisualEffect::NONE;
     state = BattleScreenState::ACTIONS;
 }
 
@@ -434,12 +457,86 @@ void BattleScreen::drawActionSlots()
     defendButton.draw(renderer);
 }
 
-void BattleScreen::drawBattleMessage()
+void BattleScreen::addBattleLog(const string& message)
 {
-    if (!battleMessage.empty())
+    battleLog.push_back(message);
+
+    constexpr size_t MAX_LOG_ENTRIES = 4;
+    if (battleLog.size() > MAX_LOG_ENTRIES)
     {
-        renderer.drawText(battleMessage.c_str(), 70, 510, 18);
+        battleLog.erase(battleLog.begin());
     }
+}
+
+void BattleScreen::drawBattleLog()
+{
+    renderer.drawText("BATTLE LOG", 70, 210, 16);
+
+    for (size_t index = 0; index < battleLog.size(); ++index)
+    {
+        renderer.drawText(battleLog[index].c_str(), 70, 240 + index * 24, 16);
+    }
+}
+
+void BattleScreen::drawTurnIndicator()
+{
+    const char* turnText = "ARCHANGEL'S TURN";
+
+    if (state == BattleScreenState::ENEMY_TURN)
+    {
+        turnText = "LEVIATHAN'S TURN";
+    }
+    else if (state == BattleScreenState::FINISHED)
+    {
+        turnText = enemy.isAlive() ? "DEFEAT" : "VICTORY";
+    }
+
+    renderer.drawText(turnText, 900, 210, 18);
+}
+
+void BattleScreen::startEffect(int effect)
+{
+    activeEffect = static_cast<VisualEffect>(effect);
+    effectEndsAt = SDL_GetTicks() + EFFECT_DURATION_MS;
+}
+
+void BattleScreen::drawBattleEffect()
+{
+    if (activeEffect == VisualEffect::NONE)
+    {
+        return;
+    }
+
+    if (SDL_GetTicks() >= effectEndsAt)
+    {
+        activeEffect = VisualEffect::NONE;
+        return;
+    }
+
+    const char* label = "IMPACT!";
+    Uint8 red = 190;
+    Uint8 green = 60;
+    Uint8 blue = 60;
+
+    if (activeEffect == VisualEffect::HERO_HEAL)
+    {
+        label = "HEALING!";
+        red = 50;
+        green = 160;
+        blue = 90;
+    }
+    else if (activeEffect == VisualEffect::HERO_DEFEND ||
+             activeEffect == VisualEffect::ENEMY_DEFEND)
+    {
+        label = "DEFENSE!";
+        red = 55;
+        green = 110;
+        blue = 190;
+    }
+
+    renderer.setDrawColor(red, green, blue, 255);
+    renderer.drawFilledRect(520, 340, 240, 70);
+    renderer.drawText(label, 570, 360, 24);
 }
 
 void BattleScreen::drawBottom()

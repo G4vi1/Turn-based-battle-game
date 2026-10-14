@@ -4,6 +4,7 @@
 #include "Renderer.hpp"
 #include "Button.hpp"
 #include <SDL3/SDL.h>
+#include <string>
 #include <vector>
 #include "HealthBar.hpp"
 #include "Battle.hpp"
@@ -31,11 +32,15 @@ private:
     void drawActionSlots();
     void drawBottom();
     void updateSkillButtons();
-    void drawBattleMessage();
+    void drawBattleLog();
+    void drawTurnIndicator();
+    void drawBattleEffect();
     void performHeroSkill(std::size_t skillIndex);
     void performHeroDefense();
     void performEnemyTurn();
     void restartBattle();
+    void addBattleLog(const std::string& message);
+    void startEffect(int effect);
 
     Renderer& renderer;
 
@@ -43,6 +48,20 @@ private:
     Character& hero;
     Character& enemy;
     std::string battleMessage;
+    std::vector<std::string> battleLog;
+
+    enum class VisualEffect
+    {
+        NONE,
+        HERO_HIT,
+        ENEMY_HIT,
+        HERO_HEAL,
+        HERO_DEFEND,
+        ENEMY_DEFEND
+    };
+
+    VisualEffect activeEffect = VisualEffect::NONE;
+    Uint64 effectEndsAt = 0;
 
     HealthBar heroHealthBar;
     HealthBar heroManaBar;
