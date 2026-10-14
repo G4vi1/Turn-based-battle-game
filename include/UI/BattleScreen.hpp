@@ -21,18 +21,21 @@ public:
 
     void handleEvent(const SDL_Event& event);
 
+    bool shouldClose() const;
+
 private:
 
     void drawBackground();
     void drawHeroPanel();
     void drawEnemyPanel();
-    void drawActionPanel();
     void drawActionSlots();
     void drawBottom();
     void updateSkillButtons();
     void drawBattleMessage();
     void performHeroSkill(std::size_t skillIndex);
     void performHeroDefense();
+    void performEnemyTurn();
+    void restartBattle();
 
     Renderer& renderer;
 
@@ -58,17 +61,21 @@ private:
     Button defendButton;
     Button itemButton;
     Button backButton;
+    Button continueButton;
+    Button restartButton;
+    Button exitButton;
     
 
     enum class BattleScreenState{
         ACTIONS,
         SKILLS,
+        ENEMY_TURN,
         FINISHED
     };
 
     BattleScreenState state = BattleScreenState::ACTIONS;
 
-    void drawSkillPanel();
+    bool closeRequested = false;
 };
 
 #endif

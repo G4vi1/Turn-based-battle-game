@@ -37,6 +37,9 @@ BattleScreen::BattleScreen(
       defendButton(1000, ACTION_BUTTON_Y, 180, 55, "DEFEND"),
 
       backButton(380, 555, 120, 45, "BACK"),
+      continueButton(880, ACTION_BUTTON_Y, 200, 55, "CONTINUE"),
+      restartButton(780, ACTION_BUTTON_Y, 180, 55, "RESTART"),
+      exitButton(1000, ACTION_BUTTON_Y, 180, 55, "EXIT"),
 
       heroHealthBar(70, 612, 250, 15, hero.getMaxHealth(), {40, 180, 70, 255}),
       heroManaBar(70, 662, 250, 15, hero.getMaxMana(), {150, 50, 200, 255}),
@@ -75,6 +78,16 @@ void BattleScreen::draw(){
     else
     {
         drawHeroPanel();
+
+        if (state == BattleScreenState::ENEMY_TURN)
+        {
+            continueButton.draw(renderer);
+        }
+        else if (state == BattleScreenState::FINISHED)
+        {
+            restartButton.draw(renderer);
+            exitButton.draw(renderer);
+        }
     }
 
     drawBattleMessage();
@@ -231,12 +244,6 @@ void BattleScreen::drawEnemyPanel()
     }
 }
 
-// Draws the action panel.
-
-void BattleScreen::drawActionPanel()
-{
-}
-
 void BattleScreen::handleEvent(const SDL_Event& event)
 {
     if (event.type == SDL_EVENT_MOUSE_MOTION)
@@ -268,6 +275,15 @@ void BattleScreen::handleEvent(const SDL_Event& event)
             backButton.setHovered(
                 backButton.isHovered(mouseX, mouseY)
             );
+        }
+        else if (state == BattleScreenState::ENEMY_TURN)
+        {
+            continueButton.setHovered(continueButton.isHovered(mouseX, mouseY));
+        }
+        else if (state == BattleScreenState::FINISHED)
+        {
+            restartButton.setHovered(restartButton.isHovered(mouseX, mouseY));
+            exitButton.setHovered(exitButton.isHovered(mouseX, mouseY));
         }
     }
 
@@ -309,6 +325,27 @@ void BattleScreen::handleEvent(const SDL_Event& event)
                 state = BattleScreenState::ACTIONS;
             }
         }
+        else if (state == BattleScreenState::ENEMY_TURN)
+        {
+            if (continueButton.isClicked(event))
+            {
+                continueButton.setPressed(true);
+                performEnemyTurn();
+            }
+        }
+        else if (state == BattleScreenState::FINISHED)
+        {
+            if (restartButton.isClicked(event))
+            {
+                restartButton.setPressed(true);
+                restartBattle();
+            }
+            else if (exitButton.isClicked(event))
+            {
+                exitButton.setPressed(true);
+                closeRequested = true;
+            }
+        }
     }
 
     if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
@@ -321,6 +358,9 @@ void BattleScreen::handleEvent(const SDL_Event& event)
         itemButton.setPressed(false);
         defendButton.setPressed(false);
         backButton.setPressed(false);
+        continueButton.setPressed(false);
+        restartButton.setPressed(false);
+        exitButton.setPressed(false);
     }
 }
 
@@ -337,33 +377,48 @@ void BattleScreen::performHeroSkill(size_t skillIndex)
     battleMessage = heroMessage;
     state = BattleScreenState::ACTIONS;
 
-    if (!battle.hasEnded())
-    {
-        string enemyMessage;
-        battle.enemyTurn(enemyMessage);
-        battleMessage += "  " + enemyMessage;
-    }
-
     if (battle.hasEnded())
     {
         state = BattleScreenState::FINISHED;
         battleMessage += enemy.isAlive() ? "  Victory!" : "  Defeat!";
+    }
+    else
+    {
+        state = BattleScreenState::ENEMY_TURN;
     }
 }
 
 void BattleScreen::performHeroDefense()
 {
     battle.heroDefend(battleMessage);
+    state = BattleScreenState::ENEMY_TURN;
+}
 
-    string enemyMessage;
-    battle.enemyTurn(enemyMessage);
-    battleMessage += "  " + enemyMessage;
+void BattleScreen::performEnemyTurn()
+{
+    battle.enemyTurn(battleMessage);
 
     if (battle.hasEnded())
     {
         state = BattleScreenState::FINISHED;
         battleMessage += enemy.isAlive() ? "  Victory!" : "  Defeat!";
     }
+    else
+    {
+        state = BattleScreenState::ACTIONS;
+    }
+}
+
+void BattleScreen::restartBattle()
+{
+    battle.reset();
+    battleMessage.clear();
+    state = BattleScreenState::ACTIONS;
+}
+
+bool BattleScreen::shouldClose() const
+{
+    return closeRequested;
 }
 
 // Draws the action slots, even for future ones.
@@ -385,13 +440,6 @@ void BattleScreen::drawBattleMessage()
     {
         renderer.drawText(battleMessage.c_str(), 70, 510, 18);
     }
-}
-
-// Draws the skill panel, which will be displayed
-// when the player clicks the "SKILL" button.
-
-void BattleScreen::drawSkillPanel()
-{
 }
 
 void BattleScreen::drawBottom()

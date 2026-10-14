@@ -27,7 +27,7 @@ Character createHero()
 
     Skill healingBlessing(
         "Healing Blessing",
-        SkillType::Special,
+        SkillType::Healing,
         20,
         15
     );

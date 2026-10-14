@@ -61,6 +61,8 @@ public:
     bool useMana(int manaCost);
 
     void takeDamage(double damage);
+    void heal(double amount);
+    void reset();
 
     void attack(Character& target, const Skill& skill);
 

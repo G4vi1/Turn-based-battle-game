@@ -227,11 +227,22 @@ bool Battle::heroUseSkill(size_t skillIndex, string& message)
         return false;
     }
 
-    hero.attack(enemy, selectedSkill);
-    enemy.resetDefense();
-    message = hero.getName() + " used " + selectedSkill.getName() +
-              "! " + enemy.getName() + " has " +
-              to_string(static_cast<int>(enemy.getHealth())) + " HP.";
+    if (selectedSkill.getType() == SkillType::Healing)
+    {
+        hero.useMana(selectedSkill.getManaCost());
+        hero.heal(selectedSkill.getAttackValue());
+        message = hero.getName() + " used " + selectedSkill.getName() +
+                  " and recovered " +
+                  to_string(static_cast<int>(selectedSkill.getAttackValue())) + " HP.";
+    }
+    else
+    {
+        hero.attack(enemy, selectedSkill);
+        enemy.resetDefense();
+        message = hero.getName() + " used " + selectedSkill.getName() +
+                  "! " + enemy.getName() + " has " +
+                  to_string(static_cast<int>(enemy.getHealth())) + " HP.";
+    }
     return true;
 }
 
@@ -279,6 +290,12 @@ void Battle::enemyTurn(string& message)
 bool Battle::hasEnded() const
 {
     return !hero.isAlive() || !enemy.isAlive();
+}
+
+void Battle::reset()
+{
+    hero.reset();
+    enemy.reset();
 }
 
 Character& Battle::getHero()

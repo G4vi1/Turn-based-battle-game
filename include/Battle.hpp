@@ -28,6 +28,7 @@ public:
     void heroDefend(std::string& message);
     void enemyTurn(std::string& message);
     bool hasEnded() const;
+    void reset();
 
     Character& getHero();
     Character& getEnemy();

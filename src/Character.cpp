@@ -93,6 +93,26 @@ void Character::takeDamage(double damage) {
     }
 }
 
+void Character::heal(double amount)
+{
+    if (amount > 0)
+    {
+        health += amount;
+
+        if (health > maxHealth)
+        {
+            health = maxHealth;
+        }
+    }
+}
+
+void Character::reset()
+{
+    health = maxHealth;
+    mana = maxMana;
+    isDefending = false;
+}
+
 // Activates the character's defensive state.
 
 void Character::defend() {

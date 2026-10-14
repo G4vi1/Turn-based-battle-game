@@ -56,6 +56,11 @@ int main()
             }
 
             battleScreen.handleEvent(event);
+
+            if (battleScreen.shouldClose())
+            {
+                running = false;
+            }
         }
 
         // Draws the entire battle screen.
