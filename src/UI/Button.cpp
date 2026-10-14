@@ -27,7 +27,16 @@ void Button::draw(Renderer& renderer)
 {
     // Draw the button background.
 
-    if (pressed)
+    if (!enabled)
+    {
+        renderer.setDrawColor(
+            75,
+            75,
+            75,
+            255
+        );
+    }
+    else if (pressed)
     {
         // Button is being pressed.
 
@@ -70,12 +79,14 @@ void Button::draw(Renderer& renderer)
 
     // Draw the button border.
 
-    renderer.setDrawColor(
-        230,
-        230,
-        230,
-        255
-    );
+    if (enabled)
+    {
+        renderer.setDrawColor(230, 230, 230, 255);
+    }
+    else
+    {
+        renderer.setDrawColor(120, 120, 120, 255);
+    }
 
     renderer.drawRect(
         x,
@@ -88,9 +99,9 @@ void Button::draw(Renderer& renderer)
 
     renderer.drawText(
         text.c_str(),
-        x + 20,
-        y + 20,
-        32
+        x + 16,
+        y + 17,
+        20
     );
 }
 
@@ -100,7 +111,7 @@ bool Button::isClicked(const SDL_Event& event)
 {
     // Only react to mouse button presses.
 
-    if (event.type != SDL_EVENT_MOUSE_BUTTON_DOWN)
+    if (!enabled || event.type != SDL_EVENT_MOUSE_BUTTON_DOWN)
     {
         return false;
     }
@@ -123,7 +134,8 @@ bool Button::isClicked(const SDL_Event& event)
 
 bool Button::isHovered(float mouseX, float mouseY) const
 {
-    return mouseX >= x &&
+    return enabled &&
+           mouseX >= x &&
            mouseX <= x + width &&
            mouseY >= y &&
            mouseY <= y + height;
@@ -141,6 +153,17 @@ void Button::setHovered(bool hovered)
 void Button::setPressed(bool pressed)
 {
     this->pressed = pressed;
+}
+
+void Button::setEnabled(bool enabled)
+{
+    this->enabled = enabled;
+
+    if (!enabled)
+    {
+        hovered = false;
+        pressed = false;
+    }
 }
 
 void Button::setText(const std::string& text)

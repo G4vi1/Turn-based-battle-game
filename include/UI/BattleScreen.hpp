@@ -4,6 +4,7 @@
 #include "Renderer.hpp"
 #include "Button.hpp"
 #include <SDL3/SDL.h>
+#include <vector>
 #include "HealthBar.hpp"
 #include "Character.hpp"
 
@@ -29,6 +30,7 @@ private:
     void drawActionPanel();
     void drawActionSlots();
     void drawBottom();
+    void updateSkillButtons();
 
     HealthBar heroHealthBar;
     HealthBar heroManaBar;
@@ -47,10 +49,7 @@ private:
 
         //Skillbuttons
 
-        Button skill1Button;
-        Button skill2Button;
-        Button skill3Button;
-        Button skill4Button;
+    std::vector<Button> skillButtons;
 
     Button defendButton;
     Button itemButton;

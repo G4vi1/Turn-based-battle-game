@@ -162,6 +162,11 @@ void Renderer::drawText(
         return;
     }
 
+    if (!TTF_SetFontSize(font, size))
+    {
+        return;
+    }
+
     SDL_Color color{
         255,
         255,

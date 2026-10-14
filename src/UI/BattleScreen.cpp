@@ -1,9 +1,23 @@
 #include "UI/BattleScreen.hpp"
 #include <iostream>
 #include <string>
-#include "Actions/AttackAction.hpp"
 
 using namespace std;
+
+namespace
+{
+constexpr float WINDOW_WIDTH = 1280.0f;
+constexpr float WINDOW_HEIGHT = 720.0f;
+constexpr float PANEL_X = 40.0f;
+constexpr float PANEL_WIDTH = 1200.0f;
+constexpr float ENEMY_PANEL_Y = 40.0f;
+constexpr float ACTION_PANEL_Y = 260.0f;
+constexpr float HERO_PANEL_Y = 540.0f;
+constexpr float PANEL_HEIGHT = 140.0f;
+constexpr float ACTION_BUTTON_Y = 320.0f;
+constexpr float SKILL_BUTTON_Y = 300.0f;
+constexpr float SKILL_BUTTON_HEIGHT = 55.0f;
+}
 
 // Constructor
 
@@ -19,25 +33,20 @@ BattleScreen::BattleScreen(
 
       // Main actions
 
-      skillButton(300, 580, 200, 80, "SKILL"),
-        itemButton(540, 580, 200, 80, "ITEM"),
-defendButton(780, 580, 200, 80, "DEFEND"),
+      skillButton(290, ACTION_BUTTON_Y, 200, 70, "SKILL"),
+      itemButton(540, ACTION_BUTTON_Y, 200, 70, "ITEM"),
+      defendButton(790, ACTION_BUTTON_Y, 200, 70, "DEFEND"),
 
-      // Skills
+      backButton(90, 360, 150, 50, "BACK"),
 
-      skill1Button(500, 540, 300, 55, "SKILL 1"),
-      skill2Button(820, 540, 300, 55, "SKILL 2"),
-      skill3Button(500, 605, 300, 55, "SKILL 3"),
-      skill4Button(820, 605, 300, 55, "SKILL 4"), 
+      heroHealthBar(70, 612, 250, 15, hero.getMaxHealth(), {40, 180, 70, 255}),
+      heroManaBar(70, 662, 250, 15, hero.getMaxMana(), {150, 50, 200, 255}),
 
-      backButton(300, 595, 150, 50, "BACK"),
-
-      heroHealthBar(70, 615, 200, 15, hero.getMaxHealth(), {40, 180, 70, 255}),
-      heroManaBar(70, 660, 170, 10, hero.getMaxMana(), {150, 50, 200, 255}),
-
-      enemyHealthBar(460, 138, 360, 15, enemy.getMaxHealth(), {40, 180, 70, 255}),
-      enemyManaBar(480, 180, 320, 10, enemy.getMaxMana(), {150, 50, 200, 255})
+      enemyHealthBar(70, 112, 250, 15, enemy.getMaxHealth(), {40, 180, 70, 255}),
+      enemyManaBar(70, 162, 250, 15, enemy.getMaxMana(), {150, 50, 200, 255})
 {
+    itemButton.setEnabled(false);
+    updateSkillButtons();
 }
 
 
@@ -67,12 +76,7 @@ void BattleScreen::draw(){
         drawActionSlots();
     }
     else if (state == BattleScreenState::SKILLS){
-
-        skill1Button.setText(hero.getSkills()[0].getName());
-        skill2Button.setText(hero.getSkills()[1].getName());
-        skill3Button.setText(hero.getSkills()[2].getName());
-        skill4Button.setText(hero.getSkills()[3].getName());
-
+        updateSkillButtons();
         drawSkillPanel();
 
         drawBottom();
@@ -95,8 +99,8 @@ void BattleScreen::drawBackground()
     renderer.drawFilledRect(
         0,
         0,
-        1280,
-        720
+        WINDOW_WIDTH,
+        WINDOW_HEIGHT
     );
 }
 
@@ -112,10 +116,10 @@ void BattleScreen::drawHeroPanel()
     );
 
     renderer.drawFilledRect(
-        40,
-        560,
-        1200,
-        140
+        PANEL_X,
+        HERO_PANEL_Y,
+        PANEL_WIDTH,
+        PANEL_HEIGHT
     );
 
     // Name
@@ -123,8 +127,8 @@ void BattleScreen::drawHeroPanel()
     renderer.drawText(
         hero.getName().c_str(),
         70,
-        555,
-        24
+        552,
+        26
     );
 
     // Health text
@@ -135,10 +139,10 @@ void BattleScreen::drawHeroPanel()
         std::to_string(static_cast<int>(hero.getMaxHealth()));
 
     renderer.drawText(
-        healthText.c_str(),
+        ("HP " + healthText).c_str(),
         70,
-        578,
-        7
+        585,
+        18
     );
 
     heroHealthBar.draw(renderer);
@@ -151,13 +155,18 @@ void BattleScreen::drawHeroPanel()
         std::to_string(static_cast<int>(hero.getMaxMana()));
 
     renderer.drawText(
-        manaText.c_str(),
+        ("MP " + manaText).c_str(),
         70,
         635,
-        7
+        18
     );
 
     heroManaBar.draw(renderer);
+
+    if (hero.isDefendingState())
+    {
+        renderer.drawText("DEFENDING", 390, 612, 18);
+    }
 }
 
 // Draws the enemy panel.
@@ -172,18 +181,18 @@ void BattleScreen::drawEnemyPanel()
     );
 
     renderer.drawFilledRect(
-        440,
-        50,
-        400,
-        140
+        PANEL_X,
+        ENEMY_PANEL_Y,
+        PANEL_WIDTH,
+        PANEL_HEIGHT
     );
 
     // Name
 
     renderer.drawText(
         enemy.getName().c_str(),
-        465,
-        65,
+        70,
+        52,
         26
     );
 
@@ -195,10 +204,10 @@ void BattleScreen::drawEnemyPanel()
         std::to_string(static_cast<int>(enemy.getMaxHealth()));
 
     renderer.drawText(
-        healthText.c_str(),
-        465,
-        98,
-        7
+        ("HP " + healthText).c_str(),
+        70,
+        85,
+        18
     );
 
     enemyHealthBar.draw(renderer);
@@ -211,13 +220,18 @@ void BattleScreen::drawEnemyPanel()
         std::to_string(static_cast<int>(enemy.getMaxMana()));
 
     renderer.drawText(
-        manaText.c_str(),
-        480,
-        153,
-        7
+        ("MP " + manaText).c_str(),
+        70,
+        135,
+        18
     );
 
     enemyManaBar.draw(renderer);
+
+    if (enemy.isDefendingState())
+    {
+        renderer.drawText("DEFENDING", 390, 112, 18);
+    }
 }
 
 // Draws the action panel.
@@ -232,10 +246,10 @@ void BattleScreen::drawActionPanel()
     );
 
     renderer.drawFilledRect(
-        40,
-        520,
-        1200,
-        160
+        PANEL_X,
+        ACTION_PANEL_Y,
+        PANEL_WIDTH,
+        PANEL_HEIGHT
     );
 }
 
@@ -262,21 +276,10 @@ void BattleScreen::handleEvent(const SDL_Event& event)
         }
         else if (state == BattleScreenState::SKILLS)
         {
-            skill1Button.setHovered(
-                skill1Button.isHovered(mouseX, mouseY)
-            );
-
-            skill2Button.setHovered(
-                skill2Button.isHovered(mouseX, mouseY)
-            );
-
-            skill3Button.setHovered(
-                skill3Button.isHovered(mouseX, mouseY)
-            );
-
-            skill4Button.setHovered(
-                skill4Button.isHovered(mouseX, mouseY)
-            );
+            for (Button& skillButton : skillButtons)
+            {
+                skillButton.setHovered(skillButton.isHovered(mouseX, mouseY));
+            }
 
             backButton.setHovered(
                 backButton.isHovered(mouseX, mouseY)
@@ -306,24 +309,12 @@ void BattleScreen::handleEvent(const SDL_Event& event)
         }
         else if (state == BattleScreenState::SKILLS)
         {
-            if (skill1Button.isClicked(event))
+            for (Button& skillButton : skillButtons)
             {
-                skill1Button.setPressed(true);
-            }
-
-            if (skill2Button.isClicked(event))
-            {
-                skill2Button.setPressed(true);
-            }
-
-            if (skill3Button.isClicked(event))
-            {
-                skill3Button.setPressed(true);
-            }
-
-            if (skill4Button.isClicked(event))
-            {
-                skill4Button.setPressed(true);
+                if (skillButton.isClicked(event))
+                {
+                    skillButton.setPressed(true);
+                }
             }
 
             if (backButton.isClicked(event)){
@@ -336,10 +327,10 @@ void BattleScreen::handleEvent(const SDL_Event& event)
     if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
     {
         skillButton.setPressed(false);
-        skill1Button.setPressed(false);
-        skill2Button.setPressed(false);
-        skill3Button.setPressed(false);
-        skill4Button.setPressed(false);
+        for (Button& skillButton : skillButtons)
+        {
+            skillButton.setPressed(false);
+        }
         itemButton.setPressed(false);
         defendButton.setPressed(false);
         backButton.setPressed(false);
@@ -354,6 +345,7 @@ void BattleScreen::drawActionSlots()
     skillButton.draw(renderer);
 
     itemButton.draw(renderer);
+    renderer.drawText("COMING SOON", 566, 400, 14);
 
     defendButton.draw(renderer);
 }
@@ -371,10 +363,10 @@ void BattleScreen::drawSkillPanel()
     );
 
     renderer.drawFilledRect(
-        40,
-        520,
-        1200,
-        160
+        PANEL_X,
+        ACTION_PANEL_Y,
+        PANEL_WIDTH,
+        PANEL_HEIGHT
     );
 }
 
@@ -387,8 +379,34 @@ void BattleScreen::drawBottom()
     backButton.draw(renderer);
 
     // Skill buttons
-    skill1Button.draw(renderer);
-    skill2Button.draw(renderer);
-    skill3Button.draw(renderer);
-    skill4Button.draw(renderer);
+    for (Button& skillButton : skillButtons)
+    {
+        skillButton.draw(renderer);
+    }
+}
+
+// Rebuilds the skill controls from the hero's current skill list.
+
+void BattleScreen::updateSkillButtons()
+{
+    const vector<Skill>& skills = hero.getSkills();
+    skillButtons.clear();
+    skillButtons.reserve(skills.size());
+
+    for (size_t index = 0; index < skills.size(); ++index)
+    {
+        const float x = index % 2 == 0 ? 300.0f : 700.0f;
+        const float y = SKILL_BUTTON_Y + (index / 2) * (SKILL_BUTTON_HEIGHT + 15.0f);
+        const Skill& skill = skills[index];
+
+        skillButtons.emplace_back(
+            x,
+            y,
+            330,
+            SKILL_BUTTON_HEIGHT,
+            skill.getName() + " - " + to_string(skill.getManaCost()) + " MP"
+        );
+
+        skillButtons.back().setEnabled(hero.hasEnoughMana(skill.getManaCost()));
+    }
 }

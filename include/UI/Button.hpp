@@ -28,6 +28,10 @@ public:
 
     void setPressed(bool pressed);
 
+    // Enables or disables interaction with the button.
+
+    void setEnabled(bool enabled);
+
     // Sets the button text.
 
     void setText(const std::string& text);
@@ -55,6 +59,10 @@ private:
     // Checks if the button is pressed.
 
     bool pressed = false;
+
+    // Disabled buttons remain visible but cannot be selected.
+
+    bool enabled = true;
 
 };
 
