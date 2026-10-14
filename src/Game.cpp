@@ -10,13 +10,13 @@ void Game::run()
 
     // Hero skills
 
-    Skill holyStrike("Holy Strike", SkillType::Physical, 10, 25.0);
+    Skill holyStrike("Holy Strike", SkillType::Physical, 0, 25.0);
     Skill divineSpear("Divine Spear", SkillType::Physical, 15, 35.0);
     Skill healingBlessing("Healing Blessing", SkillType::Special, 20, 15.0);
 
     // Enemy skills
 
-    Skill shadowClaw("Shadow Claw", SkillType::Physical, 8, 20.0);
+    Skill shadowClaw("Shadow Claw", SkillType::Physical, 0, 20.0);
     Skill arcaneBlast("Arcane Blast", SkillType::Magical, 25, 45.0);
     Skill devastatingRoar("Devastating Roar", SkillType::Special, 30, 50.0);
 

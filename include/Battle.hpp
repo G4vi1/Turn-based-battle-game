@@ -39,6 +39,7 @@ private:
     string drawBar(double current, double maximum, char symbol);
     void displayStatus();
     bool turn(Character& attacker, Character& defender);
+    bool enemyTurn();
     int menu();
 };
 

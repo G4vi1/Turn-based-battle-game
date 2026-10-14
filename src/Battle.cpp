@@ -1,5 +1,6 @@
 #include "Battle.hpp"
 #include <iostream>
+#include <random>
 #include <vector>
 #include "Actions/Actions.hpp"
 
@@ -119,7 +120,7 @@ void Battle::start() {
             break;
         }
 
-        if (turn(enemy, hero)) {
+        if (enemyTurn()) {
             break;
         }
     }
@@ -204,3 +205,67 @@ bool Battle::turn(Character& attacker, Character& defender)
     return !defender.isAlive();
 }
 
+// Executes the enemy's turn automatically.
+
+bool Battle::enemyTurn()
+{
+    cout << "\n=====================================\n"
+         << "Turn: " << enemy.getName() << "\n"
+         << "=====================================\n\n";
+
+    displayStatus();
+
+    // Keeps only skills the enemy can afford to use.
+
+    const vector<Skill>& skills = enemy.getSkills();
+    vector<const Skill*> availableSkills;
+
+    for (const Skill& skill : skills)
+    {
+        if (enemy.hasEnoughMana(skill.getManaCost()))
+        {
+            availableSkills.push_back(&skill);
+        }
+    }
+
+    static random_device randomDevice;
+    static mt19937 generator(randomDevice());
+
+    // When health is low, the enemy has a 60% chance to defend.
+    double healthRatio = enemy.getHealth() / enemy.getMaxHealth();
+    uniform_int_distribution<int> chance(1, 100);
+
+    if (availableSkills.empty() || (healthRatio <= 0.30 && chance(generator) <= 60))
+    {
+        enemy.defend();
+
+        cout << "\n"
+             << enemy.getName()
+             << " is now defending!\n";
+
+        return false;
+    }
+
+    // Chooses one affordable skill at random.
+
+    uniform_int_distribution<size_t> skillChoice(0, availableSkills.size() - 1);
+    const Skill& selectedSkill = *availableSkills[skillChoice(generator)];
+
+    enemy.attack(hero, selectedSkill);
+
+    cout << "\n"
+         << enemy.getName()
+         << " used "
+         << selectedSkill.getName()
+         << "!\n\n"
+         << hero.getName()
+         << " now has "
+         << hero.getHealth()
+         << " HP.\n";
+
+    // An attack consumes the target's defensive state.
+
+    hero.resetDefense();
+
+    return !hero.isAlive();
+}
