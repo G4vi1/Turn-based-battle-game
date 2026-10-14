@@ -6,7 +6,7 @@
 #include <SDL3/SDL.h>
 #include <vector>
 #include "HealthBar.hpp"
-#include "Character.hpp"
+#include "Battle.hpp"
 
 class BattleScreen
 {
@@ -14,8 +14,7 @@ public:
 
     BattleScreen(
         Renderer& renderer,
-        Character& hero,
-        Character& enemy
+        Battle& battle
     );
 
     void draw();
@@ -31,17 +30,22 @@ private:
     void drawActionSlots();
     void drawBottom();
     void updateSkillButtons();
+    void drawBattleMessage();
+    void performHeroSkill(std::size_t skillIndex);
+    void performHeroDefense();
+
+    Renderer& renderer;
+
+    Battle& battle;
+    Character& hero;
+    Character& enemy;
+    std::string battleMessage;
 
     HealthBar heroHealthBar;
     HealthBar heroManaBar;
 
     HealthBar enemyHealthBar;
     HealthBar enemyManaBar;
-
-    Renderer& renderer;
-
-    Character& hero;
-    Character& enemy;
 
 //Buttons for the action slots.
 
@@ -58,7 +62,8 @@ private:
 
     enum class BattleScreenState{
         ACTIONS,
-        SKILLS
+        SKILLS,
+        FINISHED
     };
 
     BattleScreenState state = BattleScreenState::ACTIONS;

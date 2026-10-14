@@ -11,33 +11,32 @@ constexpr float WINDOW_HEIGHT = 720.0f;
 constexpr float PANEL_X = 40.0f;
 constexpr float PANEL_WIDTH = 1200.0f;
 constexpr float ENEMY_PANEL_Y = 40.0f;
-constexpr float ACTION_PANEL_Y = 260.0f;
 constexpr float HERO_PANEL_Y = 540.0f;
 constexpr float PANEL_HEIGHT = 140.0f;
-constexpr float ACTION_BUTTON_Y = 320.0f;
-constexpr float SKILL_BUTTON_Y = 300.0f;
-constexpr float SKILL_BUTTON_HEIGHT = 55.0f;
+constexpr float ACTION_BUTTON_Y = 582.0f;
+constexpr float SKILL_BUTTON_Y = 550.0f;
+constexpr float SKILL_BUTTON_HEIGHT = 50.0f;
 }
 
 // Constructor
 
 BattleScreen::BattleScreen(
     Renderer& renderer,
-    Character& hero,
-    Character& enemy
+    Battle& battle
 )
     : renderer(renderer),
-      hero(hero),
-      enemy(enemy),
+      battle(battle),
+      hero(battle.getHero()),
+      enemy(battle.getEnemy()),
 
 
       // Main actions
 
-      skillButton(290, ACTION_BUTTON_Y, 200, 70, "SKILL"),
-      itemButton(540, ACTION_BUTTON_Y, 200, 70, "ITEM"),
-      defendButton(790, ACTION_BUTTON_Y, 200, 70, "DEFEND"),
+      skillButton(580, ACTION_BUTTON_Y, 180, 55, "SKILL"),
+      itemButton(790, ACTION_BUTTON_Y, 180, 55, "ITEM"),
+      defendButton(1000, ACTION_BUTTON_Y, 180, 55, "DEFEND"),
 
-      backButton(90, 360, 150, 50, "BACK"),
+      backButton(380, 555, 120, 45, "BACK"),
 
       heroHealthBar(70, 612, 250, 15, hero.getMaxHealth(), {40, 180, 70, 255}),
       heroManaBar(70, 662, 250, 15, hero.getMaxMana(), {150, 50, 200, 255}),
@@ -66,21 +65,19 @@ void BattleScreen::draw(){
 
     if (state == BattleScreenState::ACTIONS)
     {
-        // Bottom panel first
-        drawActionPanel();
-
-        // Hero status over the panel
         drawHeroPanel();
-
-        // Buttons over the panel
         drawActionSlots();
     }
     else if (state == BattleScreenState::SKILLS){
         updateSkillButtons();
-        drawSkillPanel();
-
         drawBottom();
     }
+    else
+    {
+        drawHeroPanel();
+    }
+
+    drawBattleMessage();
 
     renderer.present();
 }
@@ -238,19 +235,6 @@ void BattleScreen::drawEnemyPanel()
 
 void BattleScreen::drawActionPanel()
 {
-    renderer.setDrawColor(
-        80,
-        80,
-        80,
-        255
-    );
-
-    renderer.drawFilledRect(
-        PANEL_X,
-        ACTION_PANEL_Y,
-        PANEL_WIDTH,
-        PANEL_HEIGHT
-    );
 }
 
 void BattleScreen::handleEvent(const SDL_Event& event)
@@ -305,15 +289,18 @@ void BattleScreen::handleEvent(const SDL_Event& event)
             if (defendButton.isClicked(event))
             {
                 defendButton.setPressed(true);
+                performHeroDefense();
             }
         }
         else if (state == BattleScreenState::SKILLS)
         {
-            for (Button& skillButton : skillButtons)
+            for (size_t index = 0; index < skillButtons.size(); ++index)
             {
-                if (skillButton.isClicked(event))
+                if (skillButtons[index].isClicked(event))
                 {
-                    skillButton.setPressed(true);
+                    skillButtons[index].setPressed(true);
+                    performHeroSkill(index);
+                    break;
                 }
             }
 
@@ -337,6 +324,48 @@ void BattleScreen::handleEvent(const SDL_Event& event)
     }
 }
 
+void BattleScreen::performHeroSkill(size_t skillIndex)
+{
+    string heroMessage;
+
+    if (!battle.heroUseSkill(skillIndex, heroMessage))
+    {
+        battleMessage = heroMessage;
+        return;
+    }
+
+    battleMessage = heroMessage;
+    state = BattleScreenState::ACTIONS;
+
+    if (!battle.hasEnded())
+    {
+        string enemyMessage;
+        battle.enemyTurn(enemyMessage);
+        battleMessage += "  " + enemyMessage;
+    }
+
+    if (battle.hasEnded())
+    {
+        state = BattleScreenState::FINISHED;
+        battleMessage += enemy.isAlive() ? "  Victory!" : "  Defeat!";
+    }
+}
+
+void BattleScreen::performHeroDefense()
+{
+    battle.heroDefend(battleMessage);
+
+    string enemyMessage;
+    battle.enemyTurn(enemyMessage);
+    battleMessage += "  " + enemyMessage;
+
+    if (battle.hasEnded())
+    {
+        state = BattleScreenState::FINISHED;
+        battleMessage += enemy.isAlive() ? "  Victory!" : "  Defeat!";
+    }
+}
+
 // Draws the action slots, even for future ones.
 
 void BattleScreen::drawActionSlots()
@@ -345,9 +374,17 @@ void BattleScreen::drawActionSlots()
     skillButton.draw(renderer);
 
     itemButton.draw(renderer);
-    renderer.drawText("COMING SOON", 566, 400, 14);
+    renderer.drawText("COMING SOON", 808, 650, 12);
 
     defendButton.draw(renderer);
+}
+
+void BattleScreen::drawBattleMessage()
+{
+    if (!battleMessage.empty())
+    {
+        renderer.drawText(battleMessage.c_str(), 70, 510, 18);
+    }
 }
 
 // Draws the skill panel, which will be displayed
@@ -355,19 +392,6 @@ void BattleScreen::drawActionSlots()
 
 void BattleScreen::drawSkillPanel()
 {
-    renderer.setDrawColor(
-        70,
-        70,
-        70,
-        255
-    );
-
-    renderer.drawFilledRect(
-        PANEL_X,
-        ACTION_PANEL_Y,
-        PANEL_WIDTH,
-        PANEL_HEIGHT
-    );
 }
 
 void BattleScreen::drawBottom()
@@ -395,14 +419,14 @@ void BattleScreen::updateSkillButtons()
 
     for (size_t index = 0; index < skills.size(); ++index)
     {
-        const float x = index % 2 == 0 ? 300.0f : 700.0f;
-        const float y = SKILL_BUTTON_Y + (index / 2) * (SKILL_BUTTON_HEIGHT + 15.0f);
+        const float x = index % 2 == 0 ? 530.0f : 880.0f;
+        const float y = SKILL_BUTTON_Y + (index / 2) * (SKILL_BUTTON_HEIGHT + 10.0f);
         const Skill& skill = skills[index];
 
         skillButtons.emplace_back(
             x,
             y,
-            330,
+            300,
             SKILL_BUTTON_HEIGHT,
             skill.getName() + " - " + to_string(skill.getManaCost()) + " MP"
         );

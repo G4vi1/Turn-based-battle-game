@@ -15,21 +15,21 @@ Character createHero()
         "Holy Strike",
         SkillType::Physical,
         0,
-        0
+        25
     );
 
     Skill divineSpear(
         "Divine Spear",
         SkillType::Physical,
-        0,
-        0
+        15,
+        35
     );
 
     Skill healingBlessing(
         "Healing Blessing",
-        SkillType::Magical,
-        0,
-        0
+        SkillType::Special,
+        20,
+        15
     );
 
     Skill fourthSkill(
@@ -56,6 +56,10 @@ Character createEnemy()
         15,
         70
     );
+
+    enemy.addSkill(Skill("Shadow Claw", SkillType::Physical, 0, 20));
+    enemy.addSkill(Skill("Arcane Blast", SkillType::Magical, 25, 45));
+    enemy.addSkill(Skill("Devastating Roar", SkillType::Special, 30, 50));
 
     return enemy;
 }

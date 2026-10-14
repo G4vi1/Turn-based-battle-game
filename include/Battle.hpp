@@ -3,6 +3,7 @@
 
 #include "Character.hpp"
 #include "Actions/Action.hpp"
+#include <string>
 #include <vector>
 
 using namespace std;
@@ -22,6 +23,14 @@ public:
     // Public methods
 
     void start();
+
+    bool heroUseSkill(std::size_t skillIndex, std::string& message);
+    void heroDefend(std::string& message);
+    void enemyTurn(std::string& message);
+    bool hasEnded() const;
+
+    Character& getHero();
+    Character& getEnemy();
 
 private:
 

@@ -1,6 +1,7 @@
 #include "UI/Renderer.hpp"
 #include "UI/BattleScreen.hpp"
 #include "GameData/Characters.hpp"
+#include "Battle.hpp"
 
 #include <SDL3/SDL.h>
 #include <iostream>
@@ -26,13 +27,13 @@ int main()
 
     Character hero = createHero();
     Character enemy = createEnemy();
+    Battle battle(hero, enemy);
 
     // Creates the battle screen responsible for
 
     BattleScreen battleScreen(
         renderer,
-        hero,
-        enemy
+        battle
     );
 
     // Main application loop control.
