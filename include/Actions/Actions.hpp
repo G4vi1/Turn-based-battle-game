@@ -9,5 +9,6 @@
 
 #include "AttackAction.hpp"
 #include "DefendAction.hpp"
+#include "ItemAction.hpp"
 
 #endif

@@ -25,7 +25,9 @@ public:
     // Each derived class implements
     // its own execution logic.
 
-    virtual void execute(Character& attacker,
+    // Returns true when the action was performed and the turn can end.
+    // Returning false sends the player back to the battle action menu.
+    virtual bool execute(Character& attacker,
                          Character& defender) = 0;
 
     // Returns the action name.

@@ -10,12 +10,15 @@ add_executable(game
     src/Battle.cpp
     src/Character.cpp
     src/Skill.cpp
+    src/Item.cpp
+    src/Inventory.cpp
     src/Game.cpp
 
     src/GameData/Characters.cpp
 
     src/Actions/AttackAction.cpp
     src/Actions/DefendAction.cpp
+    src/Actions/ItemAction.cpp
 
     src/UI/Renderer.cpp
     src/UI/BattleScreen.cpp
