@@ -111,6 +111,7 @@ void Character::reset()
     health = maxHealth;
     mana = maxMana;
     isDefending = false;
+}
 
 // Restores mana without exceeding the character's maximum mana.
 void Character::restoreMana(int amount)
