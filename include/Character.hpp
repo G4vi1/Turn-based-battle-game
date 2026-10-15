@@ -2,6 +2,8 @@
 #define CHARACTER_HPP
 
 #include "Skill.hpp"
+#include "Inventory.hpp"
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -24,6 +26,7 @@ private:
     bool isDefending;
 
     vector<Skill> skills;
+    Inventory inventory;
 
 public:
 
@@ -61,10 +64,20 @@ public:
     bool useMana(int manaCost);
 
     void takeDamage(double damage);
+    void heal(double amount);
+    void restoreMana(int amount);
 
     void attack(Character& target, const Skill& skill);
 
     void addSkill(const Skill& skill);
+
+    // Inventory operations are kept on Character so the Battle class and UI
+    // can ask a character to use an item without manipulating slot data.
+    void addItem(const Item& item, int quantity);
+    const Inventory& getInventory() const;
+    Inventory& getInventory();
+    bool canUseItem(std::size_t index) const;
+    bool useItem(std::size_t index);
 };
 
 #endif

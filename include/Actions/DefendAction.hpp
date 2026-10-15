@@ -10,7 +10,7 @@ class DefendAction : public Action {
 
 public:
 
-    void execute(Character& attacker,
+    bool execute(Character& attacker,
                  Character&defender) override;
 
     std::string getName() const override;

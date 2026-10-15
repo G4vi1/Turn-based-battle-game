@@ -6,7 +6,7 @@ using namespace std;
 
 // Executes the defend action.
 
-void DefendAction::execute(Character& attacker, Character& defender)
+bool DefendAction::execute(Character& attacker, Character& defender)
 {
     // Activates the defensive state.
 
@@ -17,6 +17,8 @@ void DefendAction::execute(Character& attacker, Character& defender)
     cout << "\n"
          << attacker.getName()
          << " is now defending!\n";
+
+    return true;
 }
 
 // Returns the action name displayed in the menu.

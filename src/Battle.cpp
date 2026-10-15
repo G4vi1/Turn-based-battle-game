@@ -14,6 +14,7 @@ Battle::Battle(Character& hero, Character& enemy)
 {
     actions.push_back(new AttackAction());
     actions.push_back(new DefendAction());
+    actions.push_back(new ItemAction());
 }
 
 // Destructor
@@ -192,13 +193,15 @@ bool Battle::turn(Character& attacker, Character& defender)
 
     displayStatus();
 
-    // Prompts the player to choose an action.
+    // Keeps asking for an action until one is performed. An action such as
+    // "Back" from the item menu returns false and does not spend the turn.
+    bool actionPerformed = false;
 
-    int index = menu();
-
-    // Executes the selected action.
-
-    actions[index]->execute(attacker, defender);
+    while (!actionPerformed)
+    {
+        int index = menu();
+        actionPerformed = actions[index]->execute(attacker, defender);
+    }
 
     // Returns whether the defender has been defeated.
 

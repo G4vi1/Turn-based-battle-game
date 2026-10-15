@@ -20,6 +20,12 @@ void Game::run()
     Skill arcaneBlast("Arcane Blast", SkillType::Magical, 25, 45.0);
     Skill devastatingRoar("Devastating Roar", SkillType::Special, 30, 50.0);
 
+    // Starting consumables for the hero. Item definitions can be reused by
+    // shops, loot, enemies, or the future SDL inventory menu.
+    Item potion("Potion", 30.0, 0);
+    Item manaPotion("Mana Potion", 0.0, 25);
+    Item elixir("Elixir", 20.0, 15);
+
     // Characters
 
     Character hero("Archangel", 100.0, 0.8, 12, 60);
@@ -30,6 +36,10 @@ void Game::run()
     hero.addSkill(holyStrike);
     hero.addSkill(divineSpear);
     hero.addSkill(healingBlessing);
+
+    hero.addItem(potion, 2);
+    hero.addItem(manaPotion, 2);
+    hero.addItem(elixir, 1);
 
     // Add enemy skills
 

@@ -7,10 +7,13 @@ add_executable(game
     src/Battle.cpp
     src/Character.cpp
     src/Skill.cpp
+    src/Item.cpp
+    src/Inventory.cpp
     src/Game.cpp
 
     src/Actions/AttackAction.cpp
     src/Actions/DefendAction.cpp
+    src/Actions/ItemAction.cpp
 )
 
 target_include_directories(game PRIVATE include)

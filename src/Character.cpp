@@ -93,6 +93,38 @@ void Character::takeDamage(double damage) {
     }
 }
 
+// Restores health without exceeding the character's maximum health.
+void Character::heal(double amount)
+{
+    if (amount <= 0)
+    {
+        return;
+    }
+
+    health += amount;
+
+    if (health > maxHealth)
+    {
+        health = maxHealth;
+    }
+}
+
+// Restores mana without exceeding the character's maximum mana.
+void Character::restoreMana(int amount)
+{
+    if (amount <= 0)
+    {
+        return;
+    }
+
+    mana += amount;
+
+    if (mana > maxMana)
+    {
+        mana = maxMana;
+    }
+}
+
 // Activates the character's defensive state.
 
 void Character::defend() {
@@ -109,6 +141,53 @@ void Character::resetDefense() {
 
 void Character::addSkill(const Skill& skill) {
     skills.push_back(skill);
+}
+
+void Character::addItem(const Item& item, int quantity)
+{
+    inventory.addItem(item, quantity);
+}
+
+const Inventory& Character::getInventory() const
+{
+    return inventory;
+}
+
+Inventory& Character::getInventory()
+{
+    return inventory;
+}
+
+bool Character::canUseItem(size_t index) const
+{
+    const vector<InventorySlot>& slots = inventory.getSlots();
+
+    if (!inventory.hasAvailableItem(index))
+    {
+        return false;
+    }
+
+    const Item& item = slots[index].item;
+    const bool canRestoreHealth = item.getHealthRestore() > 0 && health < maxHealth;
+    const bool canRestoreMana = item.getManaRestore() > 0 && mana < maxMana;
+
+    return canRestoreHealth || canRestoreMana;
+}
+
+bool Character::useItem(size_t index)
+{
+    if (!canUseItem(index))
+    {
+        return false;
+    }
+
+    // Read the item before consuming it. Slots remain in the vector when their
+    // quantity reaches zero, which lets menus show that an item is out of stock.
+    const Item& item = inventory.getSlots()[index].item;
+    heal(item.getHealthRestore());
+    restoreMana(item.getManaRestore());
+
+    return inventory.consume(index);
 }
 
 // Centralizes the character's attack logic.

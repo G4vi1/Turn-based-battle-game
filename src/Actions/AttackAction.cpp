@@ -6,7 +6,7 @@ using namespace std;
 
 // Executes the complete attack flow.
 
-void AttackAction::execute(Character& attacker, Character& defender)
+bool AttackAction::execute(Character& attacker, Character& defender)
 {
     // Retrieves the attacker's available skills.
 
@@ -72,6 +72,8 @@ void AttackAction::execute(Character& attacker, Character& defender)
     // Removes the defender's defensive state.
 
     defender.resetDefense();
+
+    return true;
 }
 
 // Returns the action name displayed in the menu.
