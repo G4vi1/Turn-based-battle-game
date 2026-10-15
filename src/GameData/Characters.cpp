@@ -1,4 +1,5 @@
 #include "GameData/Characters.hpp"
+#include "Item.hpp"
 #include "Skill.hpp"
 
 Character createHero()
@@ -43,6 +44,10 @@ Character createHero()
     hero.addSkill(divineSpear);
     hero.addSkill(healingBlessing);
     hero.addSkill(fourthSkill);
+
+    hero.addItem(Item("Potion", 30.0, 0), 2);
+    hero.addItem(Item("Mana Potion", 0.0, 25), 2);
+    hero.addItem(Item("Elixir", 20.0, 15), 1);
 
     return hero;
 }

@@ -249,6 +249,27 @@ bool Battle::heroUseSkill(size_t skillIndex, string& message)
     return true;
 }
 
+bool Battle::heroUseItem(size_t itemIndex, string& message)
+{
+    const vector<InventorySlot>& slots = hero.getInventory().getSlots();
+
+    if (itemIndex >= slots.size())
+    {
+        message = "Invalid item.";
+        return false;
+    }
+
+    const Item& item = slots[itemIndex].item;
+    if (!hero.useItem(itemIndex))
+    {
+        message = item.getName() + " cannot be used right now.";
+        return false;
+    }
+
+    message = hero.getName() + " used " + item.getName() + "!";
+    return true;
+}
+
 void Battle::heroDefend(string& message)
 {
     hero.defend();

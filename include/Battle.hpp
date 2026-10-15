@@ -25,6 +25,7 @@ public:
     void start();
 
     bool heroUseSkill(std::size_t skillIndex, std::string& message);
+    bool heroUseItem(std::size_t itemIndex, std::string& message);
     void heroDefend(std::string& message);
     void enemyTurn(std::string& message);
     bool hasEnded() const;

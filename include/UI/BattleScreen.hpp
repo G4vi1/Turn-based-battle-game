@@ -32,10 +32,12 @@ private:
     void drawActionSlots();
     void drawBottom();
     void updateSkillButtons();
+    void updateItemButtons();
     void drawBattleLog();
     void drawTurnIndicator();
     void drawBattleEffect();
     void performHeroSkill(std::size_t skillIndex);
+    void performHeroItem(std::size_t itemIndex);
     void performHeroDefense();
     void performEnemyTurn();
     void restartBattle();
@@ -56,6 +58,7 @@ private:
         HERO_HIT,
         ENEMY_HIT,
         HERO_HEAL,
+        HERO_ITEM,
         HERO_DEFEND,
         ENEMY_DEFEND
     };
@@ -73,9 +76,10 @@ private:
 
     Button skillButton;
 
-        //Skillbuttons
+    //Skillbuttons
 
     std::vector<Button> skillButtons;
+    std::vector<Button> itemButtons;
 
     Button defendButton;
     Button itemButton;
@@ -88,6 +92,7 @@ private:
     enum class BattleScreenState{
         ACTIONS,
         SKILLS,
+        ITEMS,
         ENEMY_TURN,
         FINISHED
     };

@@ -48,9 +48,9 @@ BattleScreen::BattleScreen(
       enemyHealthBar(70, 112, 250, 15, enemy.getMaxHealth(), {40, 180, 70, 255}),
       enemyManaBar(70, 162, 250, 15, enemy.getMaxMana(), {150, 50, 200, 255})
 {
-    itemButton.setEnabled(false);
     addBattleLog("Battle started. Archangel's turn.");
     updateSkillButtons();
+    updateItemButtons();
 }
 
 
@@ -75,6 +75,10 @@ void BattleScreen::draw(){
     }
     else if (state == BattleScreenState::SKILLS){
         updateSkillButtons();
+        drawBottom();
+    }
+    else if (state == BattleScreenState::ITEMS){
+        updateItemButtons();
         drawBottom();
     }
     else
@@ -269,11 +273,14 @@ void BattleScreen::handleEvent(const SDL_Event& event)
                 defendButton.isHovered(mouseX, mouseY)
             );
         }
-        else if (state == BattleScreenState::SKILLS)
+        else if (state == BattleScreenState::SKILLS || state == BattleScreenState::ITEMS)
         {
-            for (Button& skillButton : skillButtons)
+            vector<Button>& buttons = state == BattleScreenState::SKILLS
+                                        ? skillButtons
+                                        : itemButtons;
+            for (Button& button : buttons)
             {
-                skillButton.setHovered(skillButton.isHovered(mouseX, mouseY));
+                button.setHovered(button.isHovered(mouseX, mouseY));
             }
 
             backButton.setHovered(
@@ -304,6 +311,7 @@ void BattleScreen::handleEvent(const SDL_Event& event)
             if (itemButton.isClicked(event))
             {
                 itemButton.setPressed(true);
+                state = BattleScreenState::ITEMS;
             }
 
             if (defendButton.isClicked(event))
@@ -325,6 +333,24 @@ void BattleScreen::handleEvent(const SDL_Event& event)
             }
 
             if (backButton.isClicked(event)){
+                backButton.setPressed(true);
+                state = BattleScreenState::ACTIONS;
+            }
+        }
+        else if (state == BattleScreenState::ITEMS)
+        {
+            for (size_t index = 0; index < itemButtons.size(); ++index)
+            {
+                if (itemButtons[index].isClicked(event))
+                {
+                    itemButtons[index].setPressed(true);
+                    performHeroItem(index);
+                    break;
+                }
+            }
+
+            if (backButton.isClicked(event))
+            {
                 backButton.setPressed(true);
                 state = BattleScreenState::ACTIONS;
             }
@@ -358,6 +384,10 @@ void BattleScreen::handleEvent(const SDL_Event& event)
         for (Button& skillButton : skillButtons)
         {
             skillButton.setPressed(false);
+        }
+        for (Button& itemButton : itemButtons)
+        {
+            itemButton.setPressed(false);
         }
         itemButton.setPressed(false);
         defendButton.setPressed(false);
@@ -407,6 +437,22 @@ void BattleScreen::performHeroDefense()
     state = BattleScreenState::ENEMY_TURN;
 }
 
+void BattleScreen::performHeroItem(size_t itemIndex)
+{
+    string heroMessage;
+
+    if (!battle.heroUseItem(itemIndex, heroMessage))
+    {
+        battleMessage = heroMessage;
+        return;
+    }
+
+    battleMessage = heroMessage;
+    addBattleLog(battleMessage);
+    startEffect(static_cast<int>(VisualEffect::HERO_ITEM));
+    state = BattleScreenState::ENEMY_TURN;
+}
+
 void BattleScreen::performEnemyTurn()
 {
     const double heroHealthBefore = hero.getHealth();
@@ -452,7 +498,6 @@ void BattleScreen::drawActionSlots()
     skillButton.draw(renderer);
 
     itemButton.draw(renderer);
-    renderer.drawText("COMING SOON", 808, 650, 12);
 
     defendButton.draw(renderer);
 }
@@ -525,6 +570,13 @@ void BattleScreen::drawBattleEffect()
         green = 160;
         blue = 90;
     }
+    else if (activeEffect == VisualEffect::HERO_ITEM)
+    {
+        label = "ITEM USED!";
+        red = 210;
+        green = 160;
+        blue = 50;
+    }
     else if (activeEffect == VisualEffect::HERO_DEFEND ||
              activeEffect == VisualEffect::ENEMY_DEFEND)
     {
@@ -547,10 +599,17 @@ void BattleScreen::drawBottom()
     // Back button
     backButton.draw(renderer);
 
-    // Skill buttons
-    for (Button& skillButton : skillButtons)
+    if (state == BattleScreenState::ITEMS && itemButtons.empty())
     {
-        skillButton.draw(renderer);
+        renderer.drawText("NO USABLE ITEMS", 530, SKILL_BUTTON_Y + 16, 20);
+    }
+
+    vector<Button>& buttons = state == BattleScreenState::SKILLS
+                                ? skillButtons
+                                : itemButtons;
+    for (Button& button : buttons)
+    {
+        button.draw(renderer);
     }
 }
 
@@ -578,4 +637,36 @@ void BattleScreen::updateSkillButtons()
 
         skillButtons.back().setEnabled(hero.hasEnoughMana(skill.getManaCost()));
     }
+}
+
+void BattleScreen::updateItemButtons()
+{
+    const vector<InventorySlot>& slots = hero.getInventory().getSlots();
+    itemButtons.clear();
+    itemButtons.reserve(slots.size());
+
+    bool hasUsableItem = false;
+    for (size_t index = 0; index < slots.size(); ++index)
+    {
+        const float x = index % 2 == 0 ? 530.0f : 880.0f;
+        const float y = SKILL_BUTTON_Y + (index / 2) * (SKILL_BUTTON_HEIGHT + 10.0f);
+        const InventorySlot& slot = slots[index];
+        const Item& item = slot.item;
+
+        itemButtons.emplace_back(
+            x,
+            y,
+            300,
+            SKILL_BUTTON_HEIGHT,
+            item.getName() + " x" + to_string(slot.quantity) +
+                " HP" + to_string(static_cast<int>(item.getHealthRestore())) +
+                " MP" + to_string(item.getManaRestore())
+        );
+
+        const bool usable = hero.canUseItem(index);
+        itemButtons.back().setEnabled(usable);
+        hasUsableItem = hasUsableItem || usable;
+    }
+
+    itemButton.setEnabled(hasUsableItem);
 }
