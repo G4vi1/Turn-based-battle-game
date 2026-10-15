@@ -599,9 +599,24 @@ void BattleScreen::drawBottom()
     // Back button
     backButton.draw(renderer);
 
-    if (state == BattleScreenState::ITEMS && itemButtons.empty())
+    if (state == BattleScreenState::ITEMS)
     {
-        renderer.drawText("NO USABLE ITEMS", 530, SKILL_BUTTON_Y + 16, 20);
+        bool hasUsableItem = false;
+        const vector<InventorySlot>& slots = hero.getInventory().getSlots();
+
+        for (size_t index = 0; index < slots.size(); ++index)
+        {
+            hasUsableItem = hasUsableItem || hero.canUseItem(index);
+        }
+
+        if (slots.empty())
+        {
+            renderer.drawText("NO ITEMS", 530, 510, 20);
+        }
+        else if (!hasUsableItem)
+        {
+            renderer.drawText("HP AND MP ARE FULL", 530, 510, 20);
+        }
     }
 
     vector<Button>& buttons = state == BattleScreenState::SKILLS
@@ -645,7 +660,6 @@ void BattleScreen::updateItemButtons()
     itemButtons.clear();
     itemButtons.reserve(slots.size());
 
-    bool hasUsableItem = false;
     for (size_t index = 0; index < slots.size(); ++index)
     {
         const float x = index % 2 == 0 ? 530.0f : 880.0f;
@@ -665,8 +679,9 @@ void BattleScreen::updateItemButtons()
 
         const bool usable = hero.canUseItem(index);
         itemButtons.back().setEnabled(usable);
-        hasUsableItem = hasUsableItem || usable;
     }
 
-    itemButton.setEnabled(hasUsableItem);
+    // The inventory remains accessible even when every item is temporarily
+    // unusable, so the player can inspect quantities and effects.
+    itemButton.setEnabled(!slots.empty());
 }
