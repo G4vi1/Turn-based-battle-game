@@ -14,6 +14,11 @@ add_executable(game
     src/Inventory.cpp
     src/Game.cpp
 
+    src/BulletHell/Arena.cpp
+    src/BulletHell/Bullet.cpp
+    src/BulletHell/BulletPattern.cpp
+    src/BulletHell/Soul.cpp
+
     src/GameData/Characters.cpp
 
     src/Actions/AttackAction.cpp
