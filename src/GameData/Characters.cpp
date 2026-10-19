@@ -69,7 +69,8 @@ Character createEnemy()
 
     enemy.addBulletPattern(BulletPattern(
         "Shadow Rain",
-        5.0f,
+        BulletPatternType::Rain,
+        8.0f,
         0.35f,
         140.0f,
         14.0f,
@@ -77,11 +78,57 @@ Character createEnemy()
 
     enemy.addBulletPattern(BulletPattern(
         "Dark Downpour",
-        6.0f,
+        BulletPatternType::Rain,
+        10.0f,
         0.22f,
         190.0f,
         12.0f,
         4));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Abyssal Barrage",
+        BulletPatternType::SideBarrage,
+        9.0f,
+        0.45f,
+        180.0f,
+        16.0f,
+        6));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Twin Eclipse",
+        BulletPatternType::Crossfire,
+        11.0f,
+        0.65f,
+        155.0f,
+        13.0f,
+        5));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Abyss Spiral",
+        BulletPatternType::Spiral,
+        12.0f,
+        0.18f,
+        150.0f,
+        10.0f,
+        4));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Void Gate",
+        BulletPatternType::WallGap,
+        11.0f,
+        1.15f,
+        120.0f,
+        20.0f,
+        7));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Falling Scythes",
+        BulletPatternType::DiagonalCross,
+        10.0f,
+        0.55f,
+        170.0f,
+        15.0f,
+        6));
 
     return enemy;
 }

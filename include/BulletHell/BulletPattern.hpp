@@ -5,11 +5,22 @@
 #include <string>
 #include <vector>
 
+enum class BulletPatternType
+{
+    Rain,
+    SideBarrage,
+    Crossfire,
+    Spiral,
+    WallGap,
+    DiagonalCross
+};
+
 class BulletPattern
 {
 public:
-    // Creates a vertical-rain pattern with its timing and bullet properties.
+    // Creates a pattern with its behavior, timing, and bullet properties.
     BulletPattern(const std::string& name,
+                  BulletPatternType type,
                   float duration,
                   float spawnInterval,
                   float bulletSpeed,
@@ -22,7 +33,8 @@ public:
     // Advances the pattern and adds new bullets to the supplied collection.
     void update(float deltaTime,
                 std::vector<Bullet>& bullets,
-                float arenaWidth);
+                float arenaWidth,
+                float arenaHeight);
 
     bool isFinished() const;
     const std::string& getName() const;
@@ -30,6 +42,7 @@ public:
 
 private:
     std::string name;
+    BulletPatternType type;
     float duration;
     float spawnInterval;
     float bulletSpeed;
@@ -38,6 +51,8 @@ private:
     float elapsedTime;
     float timeSinceLastSpawn;
     bool active;
+    bool spawnFromLeft;
+    float spiralAngle;
 };
 
 #endif

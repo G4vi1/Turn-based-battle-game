@@ -59,7 +59,7 @@ void Arena::update(float deltaTime)
 
     if (activePattern != nullptr)
     {
-        activePattern->update(deltaTime, bullets, width);
+        activePattern->update(deltaTime, bullets, width, height);
     }
 
     for (Bullet& bullet : bullets)
