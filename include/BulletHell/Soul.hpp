@@ -26,6 +26,12 @@ class Soul
 
         void moveRight(float deltaTime);
 
+        // Updates the short protection period after the Soul is hit.
+        void updateInvincibility(float deltaTime);
+
+        bool canTakeDamage() const;
+        void startInvincibility(float duration);
+
         /* Garantees that the Soul will stay 
         within the boundaries of the room.*/
 
@@ -42,12 +48,16 @@ class Soul
 
         float getY() const;
 
+        // Returns the side length used for boundary and collision checks.
+        float getSize() const;
+
     private:
 
         float x; // The horizontal position of the Soul
         float y; // The vertical position of the Soul
         float speed; // The speed at which the Soul moves
         float size; // The size of the Soul, used for collision detection
+        float invincibilityTime;
 };
 
 #endif

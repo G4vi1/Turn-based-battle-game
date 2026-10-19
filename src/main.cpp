@@ -41,11 +41,17 @@ int main()
     bool running = true;
 
     SDL_Event event;
+    Uint64 previousFrameTime = SDL_GetTicks();
 
     // Main loop.
 
     while (running)
     {
+        const Uint64 currentFrameTime = SDL_GetTicks();
+        const float deltaTime =
+            static_cast<float>(currentFrameTime - previousFrameTime) / 1000.0f;
+        previousFrameTime = currentFrameTime;
+
         // Processes every SDL event generated
         // since the previous frame.
 
@@ -62,6 +68,8 @@ int main()
                 running = false;
             }
         }
+
+        battleScreen.update(deltaTime);
 
         // Draws the entire battle screen.
 

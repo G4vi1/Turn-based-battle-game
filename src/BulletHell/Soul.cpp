@@ -1,7 +1,11 @@
 #include "BulletHell/Soul.hpp"
 
 Soul::Soul(float startX, float startY, float speed)
-    : x(startX), y(startY), speed(speed), size(20.0f) // Initialize size to a default value
+    : x(startX),
+      y(startY),
+      speed(speed),
+      size(20.0f),
+      invincibilityTime(0.0f)
 {
 }
 
@@ -23,6 +27,32 @@ void Soul::moveLeft(float deltaTime)
 void Soul::moveRight(float deltaTime)
 {
     x += speed * deltaTime;
+}
+
+void Soul::updateInvincibility(float deltaTime)
+{
+    if (invincibilityTime > 0.0f)
+    {
+        invincibilityTime -= deltaTime;
+
+        if (invincibilityTime < 0.0f)
+        {
+            invincibilityTime = 0.0f;
+        }
+    }
+}
+
+bool Soul::canTakeDamage() const
+{
+    return invincibilityTime <= 0.0f;
+}
+
+void Soul::startInvincibility(float duration)
+{
+    if (duration > 0.0f)
+    {
+        invincibilityTime = duration;
+    }
 }
 
 // Prevents the Soul from moving beyond the arena boundaries.
@@ -66,4 +96,9 @@ float Soul::getX() const
 float Soul::getY() const
 {
     return y;
+}
+
+float Soul::getSize() const
+{
+    return size;
 }

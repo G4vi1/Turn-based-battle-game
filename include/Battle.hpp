@@ -3,6 +3,7 @@
 
 #include "Character.hpp"
 #include "Actions/Action.hpp"
+#include "BulletHell/Arena.hpp"
 #include <string>
 #include <vector>
 
@@ -28,6 +29,19 @@ public:
     bool heroUseItem(std::size_t itemIndex, std::string& message);
     void heroDefend(std::string& message);
     void enemyTurn(std::string& message);
+
+    // Bullet Hell phase API. The SDL layer will call update and movement
+    // methods once per frame while this phase is active.
+    bool startEnemyBulletHell(std::string& message);
+    void updateBulletHell(float deltaTime);
+    void moveBulletHellSoulUp(float deltaTime);
+    void moveBulletHellSoulDown(float deltaTime);
+    void moveBulletHellSoulLeft(float deltaTime);
+    void moveBulletHellSoulRight(float deltaTime);
+    bool isBulletHellActive() const;
+    bool isBulletHellReadyToResolve() const;
+    bool resolveBulletHell(std::string& message);
+    const Arena& getBulletHellArena() const;
     bool hasEnded() const;
     void reset();
 
@@ -40,6 +54,9 @@ private:
 
     Character& hero;
     Character& enemy;
+    Arena bulletHellArena;
+    bool bulletHellInProgress;
+    std::string activeBulletPatternName;
 
     // Stores the available actions for the battle.
 

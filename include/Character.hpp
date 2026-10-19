@@ -3,6 +3,7 @@
 
 #include "Skill.hpp"
 #include "Inventory.hpp"
+#include "BulletHell/BulletPattern.hpp"
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -26,6 +27,7 @@ private:
     bool isDefending;
 
     vector<Skill> skills;
+    vector<BulletPattern> bulletPatterns;
     Inventory inventory;
 
 public:
@@ -55,6 +57,8 @@ public:
     double getMaxMana() const;
 
     const vector<Skill>& getSkills() const;
+    const vector<BulletPattern>& getBulletPatterns() const;
+    vector<BulletPattern>& getBulletPatterns();
 
     // Mutators
 
@@ -71,6 +75,7 @@ public:
     void attack(Character& target, const Skill& skill);
 
     void addSkill(const Skill& skill);
+    void addBulletPattern(const BulletPattern& pattern);
 
     void setHealth(double health);
     // Inventory operations are kept on Character so the Battle class and UI

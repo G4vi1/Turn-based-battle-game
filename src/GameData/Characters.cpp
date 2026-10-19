@@ -1,6 +1,7 @@
 #include "GameData/Characters.hpp"
 #include "Item.hpp"
 #include "Skill.hpp"
+#include "BulletHell/BulletPattern.hpp"
 
 Character createHero()
 {
@@ -65,6 +66,22 @@ Character createEnemy()
     enemy.addSkill(Skill("Shadow Claw", SkillType::Physical, 0, 20));
     enemy.addSkill(Skill("Arcane Blast", SkillType::Magical, 25, 45));
     enemy.addSkill(Skill("Devastating Roar", SkillType::Special, 30, 50));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Shadow Rain",
+        5.0f,
+        0.35f,
+        140.0f,
+        14.0f,
+        5));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Dark Downpour",
+        6.0f,
+        0.22f,
+        190.0f,
+        12.0f,
+        4));
 
     return enemy;
 }

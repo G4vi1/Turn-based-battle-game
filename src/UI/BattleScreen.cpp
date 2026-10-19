@@ -17,6 +17,8 @@ constexpr float ACTION_BUTTON_Y = 582.0f;
 constexpr float SKILL_BUTTON_Y = 550.0f;
 constexpr float SKILL_BUTTON_HEIGHT = 50.0f;
 constexpr Uint64 EFFECT_DURATION_MS = 700;
+constexpr float BULLET_HELL_X = 440.0f;
+constexpr float BULLET_HELL_Y = 245.0f;
 }
 
 // Constructor
@@ -81,6 +83,11 @@ void BattleScreen::draw(){
         updateItemButtons();
         drawBottom();
     }
+    else if (state == BattleScreenState::BULLET_HELL)
+    {
+        drawHeroPanel();
+        drawBulletHell();
+    }
     else
     {
         drawHeroPanel();
@@ -101,6 +108,62 @@ void BattleScreen::draw(){
     drawBattleEffect();
 
     renderer.present();
+}
+
+void BattleScreen::update(float deltaTime)
+{
+    if (state != BattleScreenState::BULLET_HELL)
+    {
+        return;
+    }
+
+    const bool* keyboardState = SDL_GetKeyboardState(nullptr);
+
+    if (keyboardState[SDL_SCANCODE_W] || keyboardState[SDL_SCANCODE_UP])
+    {
+        battle.moveBulletHellSoulUp(deltaTime);
+    }
+
+    if (keyboardState[SDL_SCANCODE_S] || keyboardState[SDL_SCANCODE_DOWN])
+    {
+        battle.moveBulletHellSoulDown(deltaTime);
+    }
+
+    if (keyboardState[SDL_SCANCODE_A] || keyboardState[SDL_SCANCODE_LEFT])
+    {
+        battle.moveBulletHellSoulLeft(deltaTime);
+    }
+
+    if (keyboardState[SDL_SCANCODE_D] || keyboardState[SDL_SCANCODE_RIGHT])
+    {
+        battle.moveBulletHellSoulRight(deltaTime);
+    }
+
+    battle.updateBulletHell(deltaTime);
+
+    if (!battle.isBulletHellReadyToResolve())
+    {
+        return;
+    }
+
+    const double heroHealthBefore = hero.getHealth();
+    battle.resolveBulletHell(battleMessage);
+    addBattleLog(battleMessage);
+
+    startEffect(hero.getHealth() < heroHealthBefore
+                    ? static_cast<int>(VisualEffect::HERO_HIT)
+                    : static_cast<int>(VisualEffect::NONE));
+
+    if (battle.hasEnded())
+    {
+        state = BattleScreenState::FINISHED;
+        battleMessage += enemy.isAlive() ? "  Victory!" : "  Defeat!";
+        addBattleLog(enemy.isAlive() ? "Defeat!" : "Victory!");
+    }
+    else
+    {
+        state = BattleScreenState::ACTIONS;
+    }
 }
 
 // Draws the background of the battle screen.
@@ -455,6 +518,13 @@ void BattleScreen::performHeroItem(size_t itemIndex)
 
 void BattleScreen::performEnemyTurn()
 {
+    if (battle.startEnemyBulletHell(battleMessage))
+    {
+        addBattleLog(battleMessage);
+        state = BattleScreenState::BULLET_HELL;
+        return;
+    }
+
     const double heroHealthBefore = hero.getHealth();
     battle.enemyTurn(battleMessage);
     addBattleLog(battleMessage);
@@ -473,6 +543,53 @@ void BattleScreen::performEnemyTurn()
     {
         state = BattleScreenState::ACTIONS;
     }
+}
+
+void BattleScreen::drawBulletHell()
+{
+    const Arena& arena = battle.getBulletHellArena();
+
+    renderer.setDrawColor(8, 8, 12, 255);
+    renderer.drawFilledRect(
+        BULLET_HELL_X,
+        BULLET_HELL_Y,
+        arena.getWidth(),
+        arena.getHeight());
+
+    renderer.setDrawColor(240, 240, 240, 255);
+    renderer.drawRect(
+        BULLET_HELL_X,
+        BULLET_HELL_Y,
+        arena.getWidth(),
+        arena.getHeight());
+
+    const Soul& soul = arena.getSoul();
+    if (soul.canTakeDamage())
+    {
+        renderer.setDrawColor(235, 55, 70, 255);
+    }
+    else
+    {
+        renderer.setDrawColor(255, 220, 70, 255);
+    }
+
+    renderer.drawFilledRect(
+        BULLET_HELL_X + soul.getX(),
+        BULLET_HELL_Y + soul.getY(),
+        soul.getSize(),
+        soul.getSize());
+
+    renderer.setDrawColor(145, 75, 225, 255);
+    for (const Bullet& bullet : arena.getBullets())
+    {
+        renderer.drawFilledRect(
+            BULLET_HELL_X + bullet.getX(),
+            BULLET_HELL_Y + bullet.getY(),
+            bullet.getSize(),
+            bullet.getSize());
+    }
+
+    renderer.drawText("DODGE!  WASD / ARROW KEYS", BULLET_HELL_X, 220, 18);
 }
 
 void BattleScreen::restartBattle()
@@ -530,6 +647,10 @@ void BattleScreen::drawTurnIndicator()
     if (state == BattleScreenState::ENEMY_TURN)
     {
         turnText = "LEVIATHAN'S TURN";
+    }
+    else if (state == BattleScreenState::BULLET_HELL)
+    {
+        turnText = "LEVIATHAN'S ATTACK";
     }
     else if (state == BattleScreenState::FINISHED)
     {

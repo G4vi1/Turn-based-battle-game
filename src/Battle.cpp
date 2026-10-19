@@ -10,7 +10,10 @@ using namespace std;
 // Initializes the battle by defining the two combatants.
 
 Battle::Battle(Character& hero, Character& enemy)
-    : hero(hero), enemy(enemy)
+    : hero(hero),
+      enemy(enemy),
+      bulletHellArena(400.0f, 250.0f),
+      bulletHellInProgress(false)
 {
     actions.push_back(new AttackAction());
     actions.push_back(new DefendAction());
@@ -311,6 +314,132 @@ void Battle::enemyTurn(string& message)
               to_string(static_cast<int>(hero.getHealth())) + " HP.";
 }
 
+bool Battle::startEnemyBulletHell(string& message)
+{
+    if (hasEnded())
+    {
+        message = "The battle has already ended.";
+        return false;
+    }
+
+    if (bulletHellInProgress)
+    {
+        message = "A Bullet Hell pattern is already active.";
+        return false;
+    }
+
+    vector<BulletPattern>& patterns = enemy.getBulletPatterns();
+
+    if (patterns.empty())
+    {
+        message = enemy.getName() + " has no Bullet Hell patterns.";
+        return false;
+    }
+
+    static random_device randomDevice;
+    static mt19937 generator(randomDevice());
+    uniform_int_distribution<size_t> patternChoice(0, patterns.size() - 1);
+
+    BulletPattern& selectedPattern = patterns[patternChoice(generator)];
+    const Soul& soul = bulletHellArena.getSoul();
+    bulletHellArena.placeSoul(
+        (bulletHellArena.getWidth() - soul.getSize()) / 2.0f,
+        (bulletHellArena.getHeight() - soul.getSize()) / 2.0f,
+        220.0f);
+    bulletHellArena.startPattern(selectedPattern);
+    bulletHellInProgress = bulletHellArena.isPatternActive();
+    activeBulletPatternName = selectedPattern.getName();
+
+    if (!bulletHellInProgress)
+    {
+        message = selectedPattern.getName() + " could not start.";
+        return false;
+    }
+
+    message = enemy.getName() + " used " + activeBulletPatternName + "!";
+    return true;
+}
+
+void Battle::updateBulletHell(float deltaTime)
+{
+    if (bulletHellInProgress)
+    {
+        bulletHellArena.update(deltaTime);
+    }
+}
+
+void Battle::moveBulletHellSoulUp(float deltaTime)
+{
+    if (bulletHellInProgress)
+    {
+        bulletHellArena.moveSoulUp(deltaTime);
+    }
+}
+
+void Battle::moveBulletHellSoulDown(float deltaTime)
+{
+    if (bulletHellInProgress)
+    {
+        bulletHellArena.moveSoulDown(deltaTime);
+    }
+}
+
+void Battle::moveBulletHellSoulLeft(float deltaTime)
+{
+    if (bulletHellInProgress)
+    {
+        bulletHellArena.moveSoulLeft(deltaTime);
+    }
+}
+
+void Battle::moveBulletHellSoulRight(float deltaTime)
+{
+    if (bulletHellInProgress)
+    {
+        bulletHellArena.moveSoulRight(deltaTime);
+    }
+}
+
+bool Battle::isBulletHellActive() const
+{
+    return bulletHellInProgress;
+}
+
+bool Battle::isBulletHellReadyToResolve() const
+{
+    return bulletHellInProgress && !bulletHellArena.isPatternActive();
+}
+
+bool Battle::resolveBulletHell(string& message)
+{
+    if (!bulletHellInProgress)
+    {
+        message = "No Bullet Hell pattern is active.";
+        return false;
+    }
+
+    if (!isBulletHellReadyToResolve())
+    {
+        message = "The Bullet Hell pattern has not finished.";
+        return false;
+    }
+
+    const int damageTaken = bulletHellArena.getDamageTaken();
+    hero.takeDamage(damageTaken);
+    hero.resetDefense();
+    bulletHellInProgress = false;
+
+    message = hero.getName() + " took " + to_string(damageTaken) +
+              " damage from " + activeBulletPatternName + ".";
+    activeBulletPatternName.clear();
+    return true;
+}
+
+const Arena& Battle::getBulletHellArena() const
+{
+    return bulletHellArena;
+}
+
 bool Battle::hasEnded() const
 {
     return !hero.isAlive() || !enemy.isAlive();
@@ -320,6 +449,9 @@ void Battle::reset()
 {
     hero.reset();
     enemy.reset();
+    bulletHellArena.reset();
+    bulletHellInProgress = false;
+    activeBulletPatternName.clear();
 }
 
 Character& Battle::getHero()
