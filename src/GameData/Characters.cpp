@@ -74,7 +74,9 @@ Character createEnemy()
         0.35f,
         140.0f,
         14.0f,
-        5));
+        5,
+        400.0f,
+        250.0f));
 
     enemy.addBulletPattern(BulletPattern(
         "Dark Downpour",
@@ -83,7 +85,9 @@ Character createEnemy()
         0.22f,
         190.0f,
         12.0f,
-        4));
+        4,
+        400.0f,
+        250.0f));
 
     enemy.addBulletPattern(BulletPattern(
         "Abyssal Barrage",
@@ -92,7 +96,9 @@ Character createEnemy()
         0.45f,
         180.0f,
         16.0f,
-        6));
+        6,
+        350.0f,
+        220.0f));
 
     enemy.addBulletPattern(BulletPattern(
         "Twin Eclipse",
@@ -101,7 +107,9 @@ Character createEnemy()
         0.65f,
         155.0f,
         13.0f,
-        5));
+        5,
+        380.0f,
+        230.0f));
 
     enemy.addBulletPattern(BulletPattern(
         "Abyss Spiral",
@@ -110,7 +118,9 @@ Character createEnemy()
         0.18f,
         150.0f,
         10.0f,
-        4));
+        4,
+        380.0f,
+        240.0f));
 
     enemy.addBulletPattern(BulletPattern(
         "Void Gate",
@@ -119,7 +129,9 @@ Character createEnemy()
         1.15f,
         120.0f,
         20.0f,
-        7));
+        7,
+        320.0f,
+        200.0f));
 
     enemy.addBulletPattern(BulletPattern(
         "Falling Scythes",
@@ -128,7 +140,42 @@ Character createEnemy()
         0.55f,
         170.0f,
         15.0f,
-        6));
+        6,
+        350.0f,
+        220.0f));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Abyss Hunter",
+        BulletPatternType::Homing,
+        12.0f,
+        0.90f,
+        115.0f,
+        16.0f,
+        7,
+        360.0f,
+        230.0f));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Falling Lances",
+        BulletPatternType::LanceDrop,
+        10.0f,
+        0.80f,
+        240.0f,
+        12.0f,
+        8,
+        280.0f,
+        200.0f));
+
+    enemy.addBulletPattern(BulletPattern(
+        "Dread Maze",
+        BulletPatternType::Maze,
+        12.0f,
+        0.75f,
+        85.0f,
+        18.0f,
+        6,
+        300.0f,
+        190.0f));
 
     return enemy;
 }

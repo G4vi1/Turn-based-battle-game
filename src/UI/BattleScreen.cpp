@@ -19,6 +19,8 @@ constexpr float SKILL_BUTTON_HEIGHT = 50.0f;
 constexpr Uint64 EFFECT_DURATION_MS = 700;
 constexpr float BULLET_HELL_X = 440.0f;
 constexpr float BULLET_HELL_Y = 245.0f;
+constexpr float DEFAULT_BULLET_HELL_WIDTH = 400.0f;
+constexpr float DEFAULT_BULLET_HELL_HEIGHT = 250.0f;
 }
 
 // Constructor
@@ -548,18 +550,22 @@ void BattleScreen::performEnemyTurn()
 void BattleScreen::drawBulletHell()
 {
     const Arena& arena = battle.getBulletHellArena();
+    const float arenaX = BULLET_HELL_X +
+        (DEFAULT_BULLET_HELL_WIDTH - arena.getWidth()) / 2.0f;
+    const float arenaY = BULLET_HELL_Y +
+        (DEFAULT_BULLET_HELL_HEIGHT - arena.getHeight()) / 2.0f;
 
     renderer.setDrawColor(8, 8, 12, 255);
     renderer.drawFilledRect(
-        BULLET_HELL_X,
-        BULLET_HELL_Y,
+        arenaX,
+        arenaY,
         arena.getWidth(),
         arena.getHeight());
 
     renderer.setDrawColor(240, 240, 240, 255);
     renderer.drawRect(
-        BULLET_HELL_X,
-        BULLET_HELL_Y,
+        arenaX,
+        arenaY,
         arena.getWidth(),
         arena.getHeight());
 
@@ -574,8 +580,8 @@ void BattleScreen::drawBulletHell()
     }
 
     renderer.drawFilledRect(
-        BULLET_HELL_X + soul.getX(),
-        BULLET_HELL_Y + soul.getY(),
+        arenaX + soul.getX(),
+        arenaY + soul.getY(),
         soul.getSize(),
         soul.getSize());
 
@@ -583,13 +589,13 @@ void BattleScreen::drawBulletHell()
     for (const Bullet& bullet : arena.getBullets())
     {
         renderer.drawFilledRect(
-            BULLET_HELL_X + bullet.getX(),
-            BULLET_HELL_Y + bullet.getY(),
+            arenaX + bullet.getX(),
+            arenaY + bullet.getY(),
             bullet.getSize(),
-            bullet.getSize());
+            bullet.getHeight());
     }
 
-    renderer.drawText("DODGE!  WASD / ARROW KEYS", BULLET_HELL_X, 220, 18);
+    renderer.drawText("DODGE!  WASD / ARROW KEYS", arenaX, 220, 18);
 }
 
 void BattleScreen::restartBattle()

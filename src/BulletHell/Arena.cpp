@@ -4,6 +4,8 @@
 Arena::Arena(float width, float height)
     : width(width),
       height(height),
+      defaultWidth(width),
+      defaultHeight(height),
       soul(0.0f, 0.0f, 0.0f),
       activePattern(nullptr),
       damageTaken(0),
@@ -44,12 +46,15 @@ void Arena::startPattern(BulletPattern& pattern)
 {
     bullets.clear();
     damageTaken = 0;
+    width = pattern.getArenaWidth();
+    height = pattern.getArenaHeight();
+    soul.keepInsideRoom(width, height);
     activePattern = &pattern;
     activePattern->start();
 
     if (activePattern->isFinished())
     {
-        activePattern = nullptr;
+        reset();
     }
 }
 
@@ -64,7 +69,7 @@ void Arena::update(float deltaTime)
 
     for (Bullet& bullet : bullets)
     {
-        bullet.update(deltaTime);
+        bullet.update(deltaTime, soul);
 
         // A bullet can damage the Soul once before being removed.
         if (soul.canTakeDamage() && bullet.collidesWith(soul))
@@ -85,9 +90,11 @@ void Arena::update(float deltaTime)
                        }),
         bullets.end());
 
-    // The phase ends only after the pattern and all spawned bullets finish.
-    if (activePattern != nullptr && activePattern->isFinished() && bullets.empty())
+    // Pattern duration is the final limit for every attack. This is important
+    // for homing bullets, which could otherwise remain inside the arena.
+    if (activePattern != nullptr && activePattern->isFinished())
     {
+        bullets.clear();
         activePattern = nullptr;
     }
 }
@@ -97,6 +104,9 @@ void Arena::reset()
     activePattern = nullptr;
     bullets.clear();
     damageTaken = 0;
+    width = defaultWidth;
+    height = defaultHeight;
+    soul.keepInsideRoom(width, height);
 }
 
 bool Arena::isPatternActive() const

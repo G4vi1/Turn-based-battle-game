@@ -12,10 +12,12 @@ public:
            float speedX,
            float speedY,
            float size,
-           int damage);
+           int damage,
+           float height = -1.0f,
+           bool homing = false);
 
-    // Moves the bullet according to its velocity and elapsed time.
-    void update(float deltaTime);
+    // Moves the bullet and optionally steers it toward the Soul.
+    void update(float deltaTime, const Soul& soul);
 
     // Reports whether the bullet has completely left the arena.
     bool isOutsideArena(float arenaWidth, float arenaHeight) const;
@@ -26,6 +28,7 @@ public:
     float getX() const;
     float getY() const;
     float getSize() const;
+    float getHeight() const;
     int getDamage() const;
     bool isActive() const;
 
@@ -38,8 +41,11 @@ private:
     float speedX;
     float speedY;
     float size;
+    float height;
     int damage;
     bool active;
+    bool homing;
+    float homingSpeed;
 };
 
 #endif

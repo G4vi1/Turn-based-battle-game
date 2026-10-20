@@ -38,6 +38,8 @@ class Arena
     private:
         float width; // The width of the arena
         float height; // The height of the arena
+        float defaultWidth;
+        float defaultHeight;
         Soul soul; // The Soul object representing the player
         BulletPattern* activePattern;
         std::vector<Bullet> bullets;

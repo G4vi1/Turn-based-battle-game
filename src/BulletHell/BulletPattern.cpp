@@ -9,7 +9,9 @@ BulletPattern::BulletPattern(const std::string& name,
                              float spawnInterval, // The time between each bullet spawn.
                              float bulletSpeed, // The speed of each bullet.
                              float bulletSize, // The size of each bullet.
-                             int bulletDamage) // The damage of each bullet.
+                             int bulletDamage, // The damage of each bullet.
+                             float arenaWidth,
+                             float arenaHeight)
     : name(name), // The name of the bullet pattern.
       type(type), // The movement behavior used by the pattern.
       duration(duration), // The total time the pattern will be active.
@@ -17,11 +19,14 @@ BulletPattern::BulletPattern(const std::string& name,
       bulletSpeed(bulletSpeed), // The speed of each bullet.
       bulletSize(bulletSize), // The size of each bullet.
       bulletDamage(bulletDamage), // The damage of each bullet.
+      arenaWidth(arenaWidth), // The width used while this pattern is active.
+      arenaHeight(arenaHeight), // The height used while this pattern is active.
       elapsedTime(0.0f), // The time that has elapsed since the pattern started.
       timeSinceLastSpawn(0.0f),// The time that has elapsed since the last bullet was spawned.
       active(false), // Whether the pattern is currently active.
       spawnFromLeft(true), // The side used by the next lateral bullet.
-      spiralAngle(0.0f) // The direction used by the next spiral bullet.
+      spiralAngle(0.0f), // The direction used by the next spiral bullet.
+      mazeOffset(0) // The horizontal shift applied to the next maze opening.
 {
 }
 
@@ -34,9 +39,11 @@ void BulletPattern::start()
     // Reset the time since last spawn to zero.
     timeSinceLastSpawn = 0.0f;
     // The pattern is active if the duration and spawn interval are both positive.
-    active = duration > 0.0f && spawnInterval > 0.0f;
+    active = duration > 0.0f && spawnInterval > 0.0f &&
+             arenaWidth >= bulletSize && arenaHeight >= bulletSize;
     spawnFromLeft = true;
     spiralAngle = 0.0f;
+    mazeOffset = 0;
 }
 
 // Advances the pattern and adds new bullets to the supplied collection.
@@ -166,6 +173,55 @@ void BulletPattern::update(float deltaTime,
                                  bulletSize,
                                  bulletDamage);
         }
+        else if (type == BulletPatternType::Homing)
+        {
+            bullets.emplace_back(horizontalPosition(generator),
+                                 -bulletSize,
+                                 0.0f,
+                                 bulletSpeed,
+                                 bulletSize,
+                                 bulletDamage,
+                                 -1.0f,
+                                 true);
+        }
+        else if (type == BulletPatternType::LanceDrop)
+        {
+            const float lanceHeight = bulletSize * 5.0f;
+
+            bullets.emplace_back(horizontalPosition(generator),
+                                 -lanceHeight,
+                                 0.0f,
+                                 bulletSpeed,
+                                 bulletSize,
+                                 bulletDamage,
+                                 lanceHeight);
+        }
+        else if (type == BulletPatternType::Maze)
+        {
+            const int columnCount = static_cast<int>(arenaWidth / bulletSize);
+            const int gapWidth = 3;
+            const int maximumGapStart = std::max(0, columnCount - gapWidth);
+            const int gapStart = mazeOffset % (maximumGapStart + 1);
+
+            for (int column = 0; column < columnCount; ++column)
+            {
+                const bool isGap = column >= gapStart &&
+                                   column < gapStart + gapWidth;
+
+                if (!isGap)
+                {
+                    bullets.emplace_back(column * bulletSize,
+                                         -bulletSize,
+                                         0.0f,
+                                         bulletSpeed,
+                                         bulletSize,
+                                         bulletDamage);
+                }
+            }
+
+            // Each new wall shifts the opening, forming a scrolling maze.
+            mazeOffset += columnCount / 3 + 1;
+        }
         timeSinceLastSpawn -= spawnInterval;
     }
 
@@ -188,4 +244,14 @@ const std::string& BulletPattern::getName() const
 float BulletPattern::getDuration() const
 {
     return duration;
+}
+
+float BulletPattern::getArenaWidth() const
+{
+    return arenaWidth;
+}
+
+float BulletPattern::getArenaHeight() const
+{
+    return arenaHeight;
 }

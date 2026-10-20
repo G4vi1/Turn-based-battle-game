@@ -341,11 +341,6 @@ bool Battle::startEnemyBulletHell(string& message)
     uniform_int_distribution<size_t> patternChoice(0, patterns.size() - 1);
 
     BulletPattern& selectedPattern = patterns[patternChoice(generator)];
-    const Soul& soul = bulletHellArena.getSoul();
-    bulletHellArena.placeSoul(
-        (bulletHellArena.getWidth() - soul.getSize()) / 2.0f,
-        (bulletHellArena.getHeight() - soul.getSize()) / 2.0f,
-        220.0f);
     bulletHellArena.startPattern(selectedPattern);
     bulletHellInProgress = bulletHellArena.isPatternActive();
     activeBulletPatternName = selectedPattern.getName();
@@ -355,6 +350,12 @@ bool Battle::startEnemyBulletHell(string& message)
         message = selectedPattern.getName() + " could not start.";
         return false;
     }
+
+    const float soulSize = bulletHellArena.getSoul().getSize();
+    bulletHellArena.placeSoul(
+        (bulletHellArena.getWidth() - soulSize) / 2.0f,
+        (bulletHellArena.getHeight() - soulSize) / 2.0f,
+        220.0f);
 
     message = enemy.getName() + " used " + activeBulletPatternName + "!";
     return true;
@@ -427,6 +428,7 @@ bool Battle::resolveBulletHell(string& message)
     const int damageTaken = bulletHellArena.getDamageTaken();
     hero.takeDamage(damageTaken);
     hero.resetDefense();
+    bulletHellArena.reset();
     bulletHellInProgress = false;
 
     message = hero.getName() + " took " + to_string(damageTaken) +

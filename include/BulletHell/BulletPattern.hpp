@@ -12,7 +12,10 @@ enum class BulletPatternType
     Crossfire,
     Spiral,
     WallGap,
-    DiagonalCross
+    DiagonalCross,
+    Homing,
+    LanceDrop,
+    Maze
 };
 
 class BulletPattern
@@ -25,7 +28,9 @@ public:
                   float spawnInterval,
                   float bulletSpeed,
                   float bulletSize,
-                  int bulletDamage);
+                  int bulletDamage,
+                  float arenaWidth,
+                  float arenaHeight);
 
     // Resets the internal timers before the pattern starts.
     void start();
@@ -39,6 +44,8 @@ public:
     bool isFinished() const;
     const std::string& getName() const;
     float getDuration() const;
+    float getArenaWidth() const;
+    float getArenaHeight() const;
 
 private:
     std::string name;
@@ -48,11 +55,14 @@ private:
     float bulletSpeed;
     float bulletSize;
     int bulletDamage;
+    float arenaWidth;
+    float arenaHeight;
     float elapsedTime;
     float timeSinceLastSpawn;
     bool active;
     bool spawnFromLeft;
     float spiralAngle;
+    int mazeOffset;
 };
 
 #endif
