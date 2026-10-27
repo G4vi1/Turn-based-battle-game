@@ -93,20 +93,24 @@ void Character::takeDamage(double damage) {
     }
 }
 
-// Restores health without exceeding the character's maximum health.
 void Character::heal(double amount)
 {
-    if (amount <= 0)
+    if (amount > 0)
     {
-        return;
-    }
+        health += amount;
 
-    health += amount;
-
-    if (health > maxHealth)
-    {
-        health = maxHealth;
+        if (health > maxHealth)
+        {
+            health = maxHealth;
+        }
     }
+}
+
+void Character::reset()
+{
+    health = maxHealth;
+    mana = maxMana;
+    isDefending = false;
 }
 
 // Restores mana without exceeding the character's maximum mana.
@@ -224,4 +228,18 @@ void Character::attack(Character& target, const Skill& skill) {
     }
 
     target.takeDamage(damage);
+}
+void Character::setHealth(double health)
+{
+    this->health = health;
+
+    if (this->health < 0)
+    {
+        this->health = 0;
+    }
+
+    if (this->health > maxHealth)
+    {
+        this->health = maxHealth;
+    }
 }

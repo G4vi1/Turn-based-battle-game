@@ -121,7 +121,11 @@ void Battle::start() {
             break;
         }
 
-        if (enemyTurn()) {
+        string enemyMessage;
+        enemyTurn(enemyMessage);
+        cout << enemyMessage << "\n";
+
+        if (!hero.isAlive()) {
             break;
         }
     }
@@ -208,18 +212,72 @@ bool Battle::turn(Character& attacker, Character& defender)
     return !defender.isAlive();
 }
 
-// Executes the enemy's turn automatically.
-
-bool Battle::enemyTurn()
+bool Battle::heroUseSkill(size_t skillIndex, string& message)
 {
-    cout << "\n=====================================\n"
-         << "Turn: " << enemy.getName() << "\n"
-         << "=====================================\n\n";
+    const vector<Skill>& skills = hero.getSkills();
 
-    displayStatus();
+    if (skillIndex >= skills.size())
+    {
+        message = "Invalid skill.";
+        return false;
+    }
 
-    // Keeps only skills the enemy can afford to use.
+    const Skill& selectedSkill = skills[skillIndex];
 
+    if (!hero.hasEnoughMana(selectedSkill.getManaCost()))
+    {
+        message = "Not enough mana.";
+        return false;
+    }
+
+    if (selectedSkill.getType() == SkillType::Healing)
+    {
+        hero.useMana(selectedSkill.getManaCost());
+        hero.heal(selectedSkill.getAttackValue());
+        message = hero.getName() + " used " + selectedSkill.getName() +
+                  " and recovered " +
+                  to_string(static_cast<int>(selectedSkill.getAttackValue())) + " HP.";
+    }
+    else
+    {
+        hero.attack(enemy, selectedSkill);
+        enemy.resetDefense();
+        message = hero.getName() + " used " + selectedSkill.getName() +
+                  "! " + enemy.getName() + " has " +
+                  to_string(static_cast<int>(enemy.getHealth())) + " HP.";
+    }
+    return true;
+}
+
+bool Battle::heroUseItem(size_t itemIndex, string& message)
+{
+    const vector<InventorySlot>& slots = hero.getInventory().getSlots();
+
+    if (itemIndex >= slots.size())
+    {
+        message = "Invalid item.";
+        return false;
+    }
+
+    const Item& item = slots[itemIndex].item;
+    if (!hero.useItem(itemIndex))
+    {
+        message = item.getName() + " cannot be used right now.";
+        return false;
+    }
+
+    message = hero.getName() + " used " + item.getName() + "!";
+    return true;
+}
+
+void Battle::heroDefend(string& message)
+{
+    hero.defend();
+    message = hero.getName() + " is now defending!";
+}
+
+void Battle::enemyTurn(string& message)
+{
     const vector<Skill>& skills = enemy.getSkills();
     vector<const Skill*> availableSkills;
 
@@ -233,42 +291,43 @@ bool Battle::enemyTurn()
 
     static random_device randomDevice;
     static mt19937 generator(randomDevice());
-
-    // When health is low, the enemy has a 60% chance to defend.
-    double healthRatio = enemy.getHealth() / enemy.getMaxHealth();
     uniform_int_distribution<int> chance(1, 100);
+    const double healthRatio = enemy.getHealth() / enemy.getMaxHealth();
 
     if (availableSkills.empty() || (healthRatio <= 0.30 && chance(generator) <= 60))
     {
         enemy.defend();
-
-        cout << "\n"
-             << enemy.getName()
-             << " is now defending!\n";
-
-        return false;
+        message = enemy.getName() + " is now defending!";
+        return;
     }
-
-    // Chooses one affordable skill at random.
 
     uniform_int_distribution<size_t> skillChoice(0, availableSkills.size() - 1);
     const Skill& selectedSkill = *availableSkills[skillChoice(generator)];
-
     enemy.attack(hero, selectedSkill);
-
-    cout << "\n"
-         << enemy.getName()
-         << " used "
-         << selectedSkill.getName()
-         << "!\n\n"
-         << hero.getName()
-         << " now has "
-         << hero.getHealth()
-         << " HP.\n";
-
-    // An attack consumes the target's defensive state.
-
     hero.resetDefense();
 
-    return !hero.isAlive();
+    message = enemy.getName() + " used " + selectedSkill.getName() +
+              "! " + hero.getName() + " has " +
+              to_string(static_cast<int>(hero.getHealth())) + " HP.";
+}
+
+bool Battle::hasEnded() const
+{
+    return !hero.isAlive() || !enemy.isAlive();
+}
+
+void Battle::reset()
+{
+    hero.reset();
+    enemy.reset();
+}
+
+Character& Battle::getHero()
+{
+    return hero;
+}
+
+Character& Battle::getEnemy()
+{
+    return enemy;
 }

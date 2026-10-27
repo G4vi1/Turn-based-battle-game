@@ -373,8 +373,21 @@ MP [********************] 70
 - GNU G++
 - Object-Oriented Programming
 - Polymorphism
+- Docker
 
 ---
+
+## Docker
+
+This project includes a Docker environment for building and running the game
+with Ubuntu 26.04, CMake, C++ build tools and SDL3.
+
+### Build the Docker image
+
+From the project root, run:
+
+```bash
+docker build -t turn-based-battle-game .
 
 # 📄 License
 

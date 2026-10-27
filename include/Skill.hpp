@@ -11,6 +11,7 @@ enum class SkillType {
     Physical,
     Magical,
     Special,
+    Healing,
     Move
 };
 

@@ -65,12 +65,14 @@ public:
 
     void takeDamage(double damage);
     void heal(double amount);
+    void reset();
     void restoreMana(int amount);
 
     void attack(Character& target, const Skill& skill);
 
     void addSkill(const Skill& skill);
 
+    void setHealth(double health);
     // Inventory operations are kept on Character so the Battle class and UI
     // can ask a character to use an item without manipulating slot data.
     void addItem(const Item& item, int quantity);
