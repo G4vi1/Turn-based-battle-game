@@ -66,6 +66,16 @@ const vector<Skill>& Character::getSkills() const {
     return skills;
 }
 
+const vector<BulletPattern>& Character::getBulletPatterns() const
+{
+    return bulletPatterns;
+}
+
+vector<BulletPattern>& Character::getBulletPatterns()
+{
+    return bulletPatterns;
+}
+
 // Mutators
 
 // Consumes the character's mana.
@@ -145,6 +155,11 @@ void Character::resetDefense() {
 
 void Character::addSkill(const Skill& skill) {
     skills.push_back(skill);
+}
+
+void Character::addBulletPattern(const BulletPattern& pattern)
+{
+    bulletPatterns.push_back(pattern);
 }
 
 void Character::addItem(const Item& item, int quantity)

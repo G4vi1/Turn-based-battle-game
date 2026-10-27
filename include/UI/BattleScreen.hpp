@@ -20,6 +20,9 @@ public:
 
     void draw();
 
+    // Advances real-time states, including the Bullet Hell phase.
+    void update(float deltaTime);
+
     void handleEvent(const SDL_Event& event);
 
     bool shouldClose() const;
@@ -36,6 +39,7 @@ private:
     void drawBattleLog();
     void drawTurnIndicator();
     void drawBattleEffect();
+    void drawBulletHell();
     void performHeroSkill(std::size_t skillIndex);
     void performHeroItem(std::size_t itemIndex);
     void performHeroDefense();
@@ -94,6 +98,7 @@ private:
         SKILLS,
         ITEMS,
         ENEMY_TURN,
+        BULLET_HELL,
         FINISHED
     };
 
