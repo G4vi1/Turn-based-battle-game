@@ -1,6 +1,18 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
-project(TurnBasedBattleGame)
+project(TurnBasedBattleGame LANGUAGES C CXX)
+
+include(FetchContent)
+
+# Keep raylib fixed to a stable release so every environment uses the same API.
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(
+    raylib
+    URL https://github.com/raysan5/raylib/archive/refs/tags/6.2.tar.gz
+    URL_HASH SHA256=df7a13129b1bec9e73a6962efff170beba310ee6eab8f94cd000b7316b4db5ee
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_MakeAvailable(raylib)
 
 find_package(SDL3 REQUIRED)
 find_package(SDL3_ttf REQUIRED)
