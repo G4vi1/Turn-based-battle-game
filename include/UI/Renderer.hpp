@@ -4,6 +4,11 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+/*
+    Renderer draws the game's visual elements on the screen. It encapsulates
+    the SDL operations used to create a window, draw graphics and text, and
+    manage graphical resources.
+*/
 class Renderer
 {
 public:
@@ -54,7 +59,7 @@ public:
     // Draws text on the screen.
 
     void drawText(
-        const char* text,
+        const char* text, // Null-terminated text string.
         float x,
         float y,
         float size
@@ -62,7 +67,13 @@ public:
 
 private:
 
+    // These pointers are private so only Renderer can manage these resources.
+
+    // The SDL window pointer used for rendering.
+
     SDL_Window* window = nullptr;
+
+    // The SDL renderer used for drawing.
 
     SDL_Renderer* renderer = nullptr;
 
