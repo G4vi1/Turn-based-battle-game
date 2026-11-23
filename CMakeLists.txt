@@ -14,6 +14,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(raylib)
 
+add_executable(raylib-smoke
+    src/raylib_smoke.cpp
+)
+target_compile_features(raylib-smoke PRIVATE cxx_std_17)
+target_link_libraries(raylib-smoke PRIVATE raylib)
+
 find_package(SDL3 REQUIRED)
 find_package(SDL3_ttf REQUIRED)
 
